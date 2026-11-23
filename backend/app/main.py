@@ -71,11 +71,15 @@ async def global_exception_handler(request: Request, exc: Exception):
     )
 
 # CORS setup for frontend
+# Allow all origins in production or when CORS_ORIGINS includes '*'
+cors_origins = settings.cors_origins_list
+allow_all = "*" in cors_origins or len(cors_origins) == 0
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.cors_origins_list,
-    allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_origins=["*"] if allow_all else cors_origins,
+    allow_credentials=False if allow_all else True,
+    allow_methods=["*"],
     allow_headers=["*"],
 )
 
