@@ -1,9 +1,17 @@
 import os
 import json
+import traceback
 import streamlit as st
 from datetime import date, timedelta
-from groq import Groq
 from dotenv import load_dotenv
+
+# Try importing groq safely
+try:
+    from groq import Groq
+    GROQ_AVAILABLE = True
+except Exception as e:
+    GROQ_AVAILABLE = False
+    GROQ_IMPORT_ERR = str(e)
 
 # Load local environment variables if available
 load_dotenv()
@@ -77,6 +85,9 @@ with st.sidebar:
     st.title("🌍 WanderPlan AI")
     st.caption("AI-Powered Personalized Itinerary Concierge")
     st.divider()
+
+    if not GROQ_AVAILABLE:
+        st.error(f"Groq library could not be loaded: {GROQ_IMPORT_ERR}")
 
     if not api_key:
         api_key = st.text_input("Groq API Key", type="password", help="Enter your Groq Cloud API Key")
