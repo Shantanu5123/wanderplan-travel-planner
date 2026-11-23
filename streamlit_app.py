@@ -61,12 +61,16 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# API Key Resolution (Streamlit secrets -> os.environ -> UI input)
+# API Key Resolution (st.secrets -> os.environ -> UI input)
 api_key = None
-if "GROQ_API_KEY" in st.secrets:
-    api_key = st.secrets["GROQ_API_KEY"]
-elif os.getenv("GROQ_API_KEY"):
-    api_key = os.getenv("GROQ_API_KEY")
+try:
+    if hasattr(st, "secrets") and "GROQ_API_KEY" in st.secrets:
+        api_key = st.secrets["GROQ_API_KEY"]
+except Exception:
+    pass
+
+if not api_key:
+    api_key = os.getenv("GROQ_API_KEY", "")
 
 # Sidebar Configuration
 with st.sidebar:
