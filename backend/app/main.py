@@ -92,6 +92,15 @@ app.include_router(itineraries.router)
 app.include_router(chat.router)
 
 
+@app.get("/", tags=["Root"])
+def root():
+    return {
+        "status": "online",
+        "service": "Personalized Travel Itinerary Planner API",
+        "docs": "/docs"
+    }
+
+
 @app.get("/api/v1/health", tags=["Health"])
 def health_check():
     return {
