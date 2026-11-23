@@ -28,6 +28,10 @@ app = FastAPI(
 # Domain 1, 3, 7: Security Headers & Rate Limiting Middleware (Points 2, 81, 82, 83)
 @app.middleware("http")
 async def security_and_rate_limit_middleware(request: Request, call_next):
+    # Handle CORS preflight OPTIONS requests immediately
+    if request.method == "OPTIONS":
+        return await call_next(request)
+
     # Enforce payload size limits on POST / PUT / PATCH
     if request.method in ["POST", "PUT", "PATCH"]:
         content_length = request.headers.get("content-length")
