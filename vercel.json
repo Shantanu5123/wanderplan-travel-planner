@@ -1,14 +1,28 @@
 {
-  "buildCommand": "cd frontend && npm install && npm run build",
-  "outputDirectory": "frontend/dist",
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "services": {
+    "wanderplan-backend": {
+      "root": "backend",
+      "framework": "fastapi",
+      "buildCommand": "pip install -r requirements.txt"
+    },
+    "frontend": {
+      "root": "frontend",
+      "framework": "vite"
+    }
+  },
   "rewrites": [
     {
-      "source": "/api/v1/(.*)",
-      "destination": "/api/index.py"
+      "source": "/api/(.*)",
+      "destination": {
+        "service": "wanderplan-backend"
+      }
     },
     {
       "source": "/(.*)",
-      "destination": "/frontend/dist/$1"
+      "destination": {
+        "service": "frontend"
+      }
     }
   ]
 }
