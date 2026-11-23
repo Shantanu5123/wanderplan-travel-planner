@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-// Ensure no trailing slashes on API_BASE_URL
-const rawBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api/v1';
+// Default to relative '/api/v1' when hosted on Vercel so no env config or CORS is needed!
+const rawBaseUrl = import.meta.env.VITE_API_BASE_URL || '/api/v1';
 const API_BASE_URL = rawBaseUrl.replace(/\/+$/, '');
 
 const apiClient = axios.create({
