@@ -1,0 +1,42 @@
+# Dependencies
+node_modules
+.pnp
+.pnp.js
+
+# Production build artifacts
+dist
+dist-ssr
+build
+*.local
+
+# Environment files (exclude real secrets, track templates)
+.env
+.env.*
+.env*.local
+backend/.env
+frontend/.env
+!.env.example
+!backend/.env.example
+!frontend/.env.example
+
+# Editor directories
+.vscode/*
+!.vscode/extensions.json
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS files
+Thumbs.db
+[Dd]esktop.ini
+.DS_Store
+
+# Python virtual envs & caches
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+*$py.class
