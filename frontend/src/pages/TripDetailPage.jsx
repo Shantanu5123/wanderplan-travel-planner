@@ -58,7 +58,27 @@ export default function TripDetailPage({ tripId }) {
         }
       }
 
-      // 2. Fetch from Supabase by tripId
+      // 2. Check local trips list
+      if (tripId && tripId !== 'new') {
+        try {
+          const localStored = JSON.parse(localStorage.getItem('wanderplan_local_trips') || '[]');
+          const match = localStored.find((t) => t.id === tripId);
+          if (match) {
+            const normalized = {
+              ...match,
+              itinerary_data: match.itinerary_data || match.itinerary || match,
+            };
+            setTrip(normalized);
+            if (normalized.itinerary_data?.days?.length > 0) {
+              setActiveDayTab(normalized.itinerary_data.days[0].day_number || 1);
+            }
+            setLoading(false);
+            return;
+          }
+        } catch (e) {}
+      }
+
+      // 3. Fetch from Supabase by tripId
       if (tripId && tripId !== 'new') {
         try {
           const { data, error } = await supabase
