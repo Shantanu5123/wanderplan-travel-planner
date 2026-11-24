@@ -54,15 +54,33 @@ export default function DashboardPage() {
 
     async function fetchUserTrips() {
       try {
-        const { data, error } = await supabase
-          .from('trips')
-          .select('*')
-          .eq('user_id', user.id)
-          .order('created_at', { ascending: false });
+        let combinedTrips = [];
 
-        if (!error && data) {
-          setTrips(data);
+        // 1. Fetch from local storage
+        try {
+          const localStored = JSON.parse(localStorage.getItem('wanderplan_local_trips') || '[]');
+          combinedTrips = [...localStored];
+        } catch (e) {
+          console.warn('Error reading local trips:', e);
         }
+
+        // 2. Fetch from Supabase if authenticated real user
+        if (user && !user.isGuest && !user.id.startsWith('guest-')) {
+          const { data, error } = await supabase
+            .from('trips')
+            .select('*')
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: false });
+
+          if (!error && data) {
+            // Merge with local trips, avoiding duplicates by destination + start_date or id
+            const existingIds = new Set(data.map(t => t.id));
+            const extraLocal = combinedTrips.filter(t => !existingIds.has(t.id));
+            combinedTrips = [...data, ...extraLocal];
+          }
+        }
+
+        setTrips(combinedTrips);
       } catch (err) {
         console.error('Error fetching trips:', err);
       } finally {
@@ -84,12 +102,21 @@ export default function DashboardPage() {
     setDeleteId(tripId);
 
     try {
-      const { error } = await supabase.from('trips').delete().eq('id', tripId);
-      if (!error) {
-        setTrips((prev) => prev.filter((t) => t.id !== tripId));
+      // 1. Remove from local storage
+      try {
+        const localStored = JSON.parse(localStorage.getItem('wanderplan_local_trips') || '[]');
+        const filtered = localStored.filter(t => t.id !== tripId);
+        localStorage.setItem('wanderplan_local_trips', JSON.stringify(filtered));
+      } catch (err) {}
+
+      // 2. Remove from Supabase if not a pure local trip
+      if (user && !user.isGuest && !String(tripId).startsWith('trip_')) {
+        await supabase.from('trips').delete().eq('id', tripId);
       }
+      setTrips((prev) => prev.filter((t) => t.id !== tripId));
     } catch (err) {
-      alert('Failed to delete trip');
+      console.warn('Delete trip warning:', err);
+      setTrips((prev) => prev.filter((t) => t.id !== tripId));
     } finally {
       setDeleteId(null);
     }
