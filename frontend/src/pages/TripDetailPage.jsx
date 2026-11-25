@@ -111,31 +111,56 @@ export default function TripDetailPage({ tripId }) {
     if (!trip) return;
 
     setSaveLoading(true);
-    try {
-      const { data, error } = await supabase.from('trips').insert([
-        {
-          user_id: user.id,
-          destination: trip.destination,
-          start_date: trip.start_date || new Date().toISOString().split('T')[0],
-          end_date: trip.end_date || new Date(Date.now() + 3 * 86400000).toISOString().split('T')[0],
-          budget: trip.budget || 'moderate',
-          travel_style: trip.travel_style || 'balanced',
-          interests: trip.interests || [],
-          itinerary_data: trip.itinerary_data,
-        },
-      ]).select();
 
-      if (!error && data) {
-        setSavedSuccess(true);
-        sessionStorage.setItem('viewing_trip', JSON.stringify(data[0]));
-      } else {
-        alert(error?.message || 'Could not save trip');
+    const today = trip.start_date || new Date().toISOString().split('T')[0];
+    const endDate = trip.end_date || new Date(Date.now() + 3 * 86400000).toISOString().split('T')[0];
+
+    const tripRecord = {
+      id: 'trip_' + Date.now(),
+      user_id: user.id,
+      destination: trip.destination,
+      start_date: today,
+      end_date: endDate,
+      budget: trip.budget || 'moderate',
+      travel_style: trip.travel_style || 'balanced',
+      interests: trip.interests || [],
+      itinerary_data: trip.itinerary_data,
+      created_at: new Date().toISOString(),
+    };
+
+    // Save to local storage
+    try {
+      const stored = JSON.parse(localStorage.getItem('wanderplan_local_trips') || '[]');
+      const updated = [tripRecord, ...stored.filter(item => item.id !== tripRecord.id)];
+      localStorage.setItem('wanderplan_local_trips', JSON.stringify(updated));
+    } catch (e) {}
+
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(user.id);
+    if (isUuid && !user.isGuest) {
+      try {
+        const { data } = await supabase.from('trips').insert([
+          {
+            user_id: user.id,
+            destination: trip.destination,
+            start_date: today,
+            end_date: endDate,
+            budget: trip.budget || 'moderate',
+            travel_style: trip.travel_style || 'balanced',
+            interests: trip.interests || [],
+            itinerary_data: trip.itinerary_data,
+          },
+        ]).select();
+
+        if (data?.[0]) {
+          sessionStorage.setItem('viewing_trip', JSON.stringify(data[0]));
+        }
+      } catch (e) {
+        console.warn('Supabase insert warning:', e);
       }
-    } catch (e) {
-      alert(e.message || 'Error saving trip');
-    } finally {
-      setSaveLoading(false);
     }
+
+    setSavedSuccess(true);
+    setSaveLoading(false);
   };
 
   if (loading) {

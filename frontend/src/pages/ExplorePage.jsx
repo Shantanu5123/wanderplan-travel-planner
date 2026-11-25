@@ -400,7 +400,7 @@ export default function ExplorePage() {
     navigate('/trip/new');
   };
 
-  // Action: Save directly to User's Supabase Dashboard
+  // Action: Save directly to User's Dashboard
   const handleSaveToMyTrips = async (e, trip) => {
     e.stopPropagation();
     if (!user) {
@@ -410,39 +410,67 @@ export default function ExplorePage() {
     }
 
     setSaveLoadingId(trip.id);
-    try {
-      const today = new Date().toISOString().split('T')[0];
-      const endDate = new Date(Date.now() + (trip.days.length - 1) * 86400000).toISOString().split('T')[0];
+    const today = new Date().toISOString().split('T')[0];
+    const endDate = new Date(Date.now() + (trip.days.length - 1) * 86400000).toISOString().split('T')[0];
 
-      const { data, error } = await supabase.from('trips').insert([
-        {
-          user_id: user.id,
-          destination: trip.destination,
-          start_date: today,
-          end_date: endDate,
-          budget: trip.budget,
-          travel_style: trip.travel_style,
-          interests: trip.interests,
-          itinerary_data: {
+    const tripRecord = {
+      id: 'trip_' + Date.now(),
+      user_id: user.id,
+      destination: trip.destination,
+      start_date: today,
+      end_date: endDate,
+      budget: trip.budget,
+      travel_style: trip.travel_style,
+      interests: trip.interests,
+      itinerary_data: {
+        destination: trip.destination,
+        summary: trip.summary,
+        estimated_total_cost: trip.estimated_total_cost,
+        days: trip.days,
+      },
+      created_at: new Date().toISOString(),
+    };
+
+    // Helper: always save to local storage so the trip is never lost
+    const saveToLocalStorage = (t) => {
+      try {
+        const stored = JSON.parse(localStorage.getItem('wanderplan_local_trips') || '[]');
+        const updated = [t, ...stored.filter(item => item.id !== t.id)];
+        localStorage.setItem('wanderplan_local_trips', JSON.stringify(updated));
+      } catch (err) {}
+    };
+
+    saveToLocalStorage(tripRecord);
+
+    // If valid UUID format, try saving to Supabase too
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(user.id);
+
+    if (isUuid && !user.isGuest) {
+      try {
+        const { data, error } = await supabase.from('trips').insert([
+          {
+            user_id: user.id,
             destination: trip.destination,
-            summary: trip.summary,
-            estimated_total_cost: trip.estimated_total_cost,
-            days: trip.days,
+            start_date: today,
+            end_date: endDate,
+            budget: trip.budget,
+            travel_style: trip.travel_style,
+            interests: trip.interests,
+            itinerary_data: tripRecord.itinerary_data,
           },
-        },
-      ]).select();
+        ]).select();
 
-      if (error) {
-        alert(error.message || 'Could not save trip');
-      } else {
-        setSavedSuccessId(trip.id);
-        setTimeout(() => setSavedSuccessId(null), 3000);
+        if (data?.[0]) {
+          saveToLocalStorage(data[0]);
+        }
+      } catch (err) {
+        console.warn('Supabase sync skipped, stored locally:', err);
       }
-    } catch (err) {
-      alert(err.message || 'Error saving trip');
-    } finally {
-      setSaveLoadingId(null);
     }
+
+    setSavedSuccessId(trip.id);
+    setSaveLoadingId(null);
+    setTimeout(() => setSavedSuccessId(null), 3000);
   };
 
   // Action: Customize in Home Planner

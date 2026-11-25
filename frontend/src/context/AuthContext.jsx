@@ -3,6 +3,18 @@ import { supabase, isSupabaseConfigured } from '../services/supabaseClient';
 
 const AuthContext = createContext(null);
 
+// Utility to produce a valid standard RFC4122 v4 UUID from any string
+function stringToUuid(str) {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = (hash << 5) - hash + str.charCodeAt(i);
+    hash |= 0;
+  }
+  const hex = Math.abs(hash).toString(16).padStart(8, '0');
+  const tail = Array.from({ length: 24 }, (_, i) => ((hash >> (i % 16)) & 0xf).toString(16)).join('');
+  return `${hex.slice(0, 8)}-${tail.slice(0, 4)}-4${tail.slice(4, 7)}-a${tail.slice(7, 10)}-${tail.slice(10, 22)}`;
+}
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [session, setSession] = useState(null);
@@ -26,7 +38,13 @@ export function AuthProvider({ children }) {
     const savedLocal = localStorage.getItem('wanderplan_user');
     if (savedLocal) {
       try {
-        setUser(JSON.parse(savedLocal));
+        const parsed = JSON.parse(savedLocal);
+        // Ensure id is a valid UUID format
+        if (parsed?.id && !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(parsed.id)) {
+          parsed.id = stringToUuid(parsed.email || 'user');
+          localStorage.setItem('wanderplan_user', JSON.stringify(parsed));
+        }
+        setUser(parsed);
       } catch {}
     }
 
@@ -98,9 +116,9 @@ export function AuthProvider({ children }) {
         error.code === 'email_not_confirmed' ||
         error.status === 400
       ) {
-        // Find existing stored profiles or generate a local verified profile
+        // Find existing stored profiles or generate a valid standard UUID
         const localUser = {
-          id: 'user_' + btoa(email).replace(/[^a-zA-Z0-9]/g, '').substring(0, 16),
+          id: stringToUuid(email.toLowerCase().trim()),
           email,
           user_metadata: { full_name: email.split('@')[0] },
           isConfirmedFallback: true,
