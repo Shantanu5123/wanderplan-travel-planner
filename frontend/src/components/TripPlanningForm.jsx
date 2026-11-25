@@ -12,6 +12,7 @@ import {
 import { generateItinerary } from '../services/api';
 import ItineraryView from './ItineraryView';
 import { useRouter } from '../services/router';
+import { useLanguage } from '../context/LanguageContext';
 
 const AVAILABLE_INTERESTS = [
   'History & Culture',
@@ -40,6 +41,7 @@ const STYLE_OPTIONS = [
 
 export default function TripPlanningForm() {
   const { navigate } = useRouter();
+  const { t } = useLanguage();
 
   const [formData, setFormData] = useState(() => {
     // Check if user came from Explore page "Customize" action
@@ -229,7 +231,7 @@ export default function TripPlanningForm() {
             {/* Budget Selection */}
             <div className="form-group">
               <label>
-                <DollarSign size={16} className="label-icon" /> Select Budget *
+                <DollarSign size={16} className="label-icon" /> {t('selectBudget')} *
               </label>
               <div className="radio-cards">
                 {BUDGET_OPTIONS.map((tier) => (
@@ -239,8 +241,8 @@ export default function TripPlanningForm() {
                     onClick={() => !loading && setFormData({ ...formData, budget: tier.id })}
                   >
                     <span className="radio-emoji">{tier.icon}</span>
-                    <div className="radio-title">{tier.label}</div>
-                    <div className="radio-desc">{tier.description}</div>
+                    <div className="radio-title">{t(`${tier.id}Label`) || tier.label}</div>
+                    <div className="radio-desc">{t(`${tier.id}Desc`) || tier.description}</div>
                   </div>
                 ))}
               </div>
@@ -250,19 +252,22 @@ export default function TripPlanningForm() {
             {/* Travel Pace & Style */}
             <div className="form-group">
               <label>
-                <Compass size={16} className="label-icon" /> Travel Style & Pace *
+                <Compass size={16} className="label-icon" /> {t('travelStyleLabel')} *
               </label>
               <div className="radio-cards">
-                {STYLE_OPTIONS.map((style) => (
-                  <div
-                    key={style.id}
-                    className={`radio-card interactive-hover ${formData.travelStyle === style.id ? 'active' : ''}`}
-                    onClick={() => !loading && setFormData({ ...formData, travelStyle: style.id })}
-                  >
-                    <div className="radio-title">{style.label}</div>
-                    <div className="radio-desc">{style.description}</div>
-                  </div>
-                ))}
+                {STYLE_OPTIONS.map((style) => {
+                  const styleKey = style.id === 'fast-paced' ? 'fastPaced' : style.id;
+                  return (
+                    <div
+                      key={style.id}
+                      className={`radio-card interactive-hover ${formData.travelStyle === style.id ? 'active' : ''}`}
+                      onClick={() => !loading && setFormData({ ...formData, travelStyle: style.id })}
+                    >
+                      <div className="radio-title">{t(`${styleKey}Label`) || style.label}</div>
+                      <div className="radio-desc">{t(`${styleKey}Desc`) || style.description}</div>
+                    </div>
+                  );
+                })}
               </div>
               {errors.travelStyle && <span className="field-error">{errors.travelStyle}</span>}
             </div>
@@ -270,7 +275,7 @@ export default function TripPlanningForm() {
             {/* Interests & Activities */}
             <div className="form-group">
               <label>
-                <Heart size={16} className="label-icon" /> What are your interests? * (Pick any)
+                <Heart size={16} className="label-icon" /> {t('interestsLabel')} *
               </label>
               <div className="chips-container">
                 {AVAILABLE_INTERESTS.map((interest) => {
@@ -301,7 +306,7 @@ export default function TripPlanningForm() {
                 </>
               ) : (
                 <>
-                  <Sparkles size={18} /> Generate AI Itinerary
+                  <Sparkles size={18} /> {t('generateBtn')}
                 </>
               )}
             </button>

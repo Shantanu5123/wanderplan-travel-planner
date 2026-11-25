@@ -13,14 +13,14 @@
   --accent-indigo: #6366f1;
   --accent-amber: #f59e0b;
 
-  --dark-bg: #0b0f19;
+  --dark-bg: #050b18;
 
   /* Glassmorphism Specs */
-  --glass-bg: rgba(22, 30, 49, 0.55);
-  --glass-bg-hover: rgba(28, 38, 62, 0.65);
-  --glass-card: rgba(18, 26, 44, 0.6);
-  --glass-elevated: rgba(24, 34, 58, 0.72);
-  --glass-inner: rgba(12, 18, 32, 0.65);
+  --glass-bg: rgba(10, 18, 36, 0.65);
+  --glass-bg-hover: rgba(14, 25, 50, 0.75);
+  --glass-card: rgba(8, 16, 34, 0.7);
+  --glass-elevated: rgba(12, 22, 45, 0.8);
+  --glass-inner: rgba(5, 11, 24, 0.75);
 
   /* Glass Borders & Highlights */
   --glass-border: rgba(255, 255, 255, 0.14);
@@ -73,20 +73,20 @@
 }
 
 /* =========================================================================
-   DYNAMIC CURSOR SPOTLIGHT GLOW
+   DYNAMIC CURSOR SPOTLIGHT GLOW (PRECISE LIGHT DIAMETER)
    ========================================================================= */
 .cursor-spotlight-layer {
   position: fixed;
   inset: 0;
   pointer-events: none;
-  z-index: 1;
+  z-index: 9999;
   background: radial-gradient(
-    650px circle at var(--cursor-x) var(--cursor-y),
-    rgba(59, 130, 246, 0.12) 0%,
-    rgba(99, 102, 241, 0.06) 35%,
-    transparent 70%
+    220px circle at var(--cursor-x) var(--cursor-y),
+    rgba(56, 189, 248, 0.15) 0%,
+    rgba(99, 102, 241, 0.06) 45%,
+    transparent 80%
   );
-  transition: opacity 0.3s ease;
+  transition: opacity 0.2s ease;
 }
 
 * {
@@ -97,13 +97,13 @@
 
 body {
   min-height: 100vh;
-  background-color: #0b0f19;
-  /* Ambient backdrop glowing orbs to shine through the frosted glass */
+  background-color: #030712;
+  /* Deep midnight navy backdrop with subtle glowing nebula orbs */
   background-image: 
-    radial-gradient(circle at 12% 18%, rgba(59, 130, 246, 0.22) 0%, transparent 45%),
-    radial-gradient(circle at 88% 22%, rgba(99, 102, 241, 0.2) 0%, transparent 45%),
-    radial-gradient(circle at 50% 80%, rgba(20, 184, 166, 0.18) 0%, transparent 50%),
-    radial-gradient(circle at 85% 85%, rgba(59, 130, 246, 0.15) 0%, transparent 40%);
+    radial-gradient(circle at 15% 15%, rgba(14, 116, 144, 0.2) 0%, transparent 45%),
+    radial-gradient(circle at 85% 20%, rgba(30, 58, 138, 0.28) 0%, transparent 45%),
+    radial-gradient(circle at 50% 80%, rgba(15, 23, 42, 0.4) 0%, transparent 50%),
+    radial-gradient(circle at 85% 85%, rgba(29, 78, 216, 0.18) 0%, transparent 40%);
   background-attachment: fixed;
   color: var(--text-main);
   overflow-x: hidden;

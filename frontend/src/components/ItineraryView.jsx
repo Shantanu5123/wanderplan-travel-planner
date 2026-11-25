@@ -218,7 +218,7 @@ export default function ItineraryView({ tripData, onModify, onSaved }) {
             <span><DollarSign size={14} /> Budget: {tripData.budget}</span>
             <span><Compass size={14} /> Style: {tripData.travel_style}</span>
             {currentItinerary.estimated_total_cost && (
-              <span>Estimated Cost: {currentItinerary.estimated_total_cost}</span>
+              <span>Estimated Cost: {formatCost(currentItinerary.estimated_total_cost)}</span>
             )}
           </div>
         </div>
@@ -407,7 +407,7 @@ export default function ItineraryView({ tripData, onModify, onSaved }) {
                                     )}
                                     {act.cost_estimate && (
                                       <span className="detail-item">
-                                        <DollarSign size={13} /> {act.cost_estimate}
+                                        <DollarSign size={13} /> {formatCost(act.cost_estimate)}
                                       </span>
                                     )}
                                   </div>

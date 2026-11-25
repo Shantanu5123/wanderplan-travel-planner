@@ -1,7 +1,7 @@
 import React from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { CurrencyProvider } from './context/CurrencyContext';
-import { LanguageProvider } from './context/LanguageContext';
+import { LanguageProvider, useLanguage } from './context/LanguageContext';
 import { HashRouter, useRouter } from './services/router';
 import Navbar from './components/Navbar';
 import TripPlanningForm from './components/TripPlanningForm';
@@ -15,15 +15,16 @@ import TripDetailPage from './pages/TripDetailPage';
 import { Sparkles, Loader2 } from 'lucide-react';
 
 function HomePlanner() {
+  const { t } = useLanguage();
   return (
     <div className="container home-container" style={{ maxWidth: '1040px', margin: '0 auto', padding: '3rem 1rem' }}>
       <header className="home-hero">
         <div className="hero-badge">
-          <Sparkles size={15} /> AI-Powered Travel Generator
+          <Sparkles size={15} /> {t('heroTag')}
         </div>
-        <h1>Your Next Adventure, Perfectly Planned</h1>
+        <h1>{t('heroTitle')}</h1>
         <p>
-          Tell us your dream destination, dates, budget, and travel style. We craft high-energy, customized day-by-day itineraries with surrounding hidden gems!
+          {t('heroSubtitle')}
         </p>
       </header>
 
