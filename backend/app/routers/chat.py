@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 from typing import List, Dict, Any, Optional
 from app.config import settings
+from app.services.knowledge_service import knowledge_base
 import json
 import re
 import logging
@@ -129,10 +130,24 @@ def chat_message(req: ChatRequest):
         raise HTTPException(status_code=500, detail="GROQ_API_KEY is not configured")
 
     try:
+        # Retrieve relevant contextual facts from FAQ knowledge base based on user's latest query
+        latest_user_text = ""
+        for m in reversed(req.messages):
+            if m.role == "user":
+                latest_user_text = m.content
+                break
+
+        kb_matches = knowledge_base.find_relevant(latest_user_text, limit=4)
+        kb_context = ""
+        if kb_matches:
+            kb_context = "\n[VERIFIED KNOWLEDGE BASE INSIGHTS]:\n" + "\n".join(
+                f"- Q: {item['question']}\n  A: {item['answer']}" for item in kb_matches
+            ) + "\nIncorporate these verified facts accurately if relevant to the user query.\n"
+
         # Explicit 30s timeout on external LLM calls (Point 18: Timeouts)
         client = Groq(api_key=settings.GROQ_API_KEY, timeout=30.0, max_retries=2)
 
-        conversation = [{"role": "system", "content": SYSTEM_PROMPT}]
+        conversation = [{"role": "system", "content": SYSTEM_PROMPT + ("\n" + kb_context if kb_context else "")}]
         for m in req.messages:
             conversation.append({"role": m.role, "content": m.content})
 
