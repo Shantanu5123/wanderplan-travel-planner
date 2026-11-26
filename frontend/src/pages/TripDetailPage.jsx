@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { supabase } from '../services/supabaseClient';
 import { useCurrency } from '../context/CurrencyContext';
 import { exportItineraryToPDF } from '../services/pdfExporter';
+import ItineraryInteractiveMap from '../components/ItineraryInteractiveMap';
 import { 
   ArrowLeft, 
   Calendar, 
@@ -33,6 +34,7 @@ export default function TripDetailPage({ tripId }) {
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [saveLoading, setSaveLoading] = useState(false);
   const [savedSuccess, setSavedSuccess] = useState(false);
+  const [hoveredActivityIndex, setHoveredActivityIndex] = useState(null);
 
   useEffect(() => {
     async function loadTrip() {
@@ -354,68 +356,89 @@ export default function TripDetailPage({ tripId }) {
           })}
         </div>
 
-        {/* Active Day Card (Frosted Glass Container) */}
+        {/* Split Layout: Day Itinerary Cards on Left, Sticky Interactive Map on Right */}
         {activeDay ? (
-          <div className="glass-card" style={{ padding: '2.5rem', borderRadius: '24px' }}>
-            <div style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.1)', paddingBottom: '1.5rem', marginBottom: '2rem' }}>
-              <span style={{ backgroundColor: 'rgba(59, 130, 246, 0.15)', color: '#60a5fa', fontWeight: 800, fontSize: '0.82rem', padding: '0.4rem 0.9rem', borderRadius: '9999px', textTransform: 'uppercase', letterSpacing: '0.06em', border: '1px solid rgba(59, 130, 246, 0.3)' }}>
-                Day {activeDay.day_number || activeDayTab} Schedule
-              </span>
-              <h2 style={{ fontSize: '1.9rem', fontWeight: 850, color: '#ffffff', marginTop: '0.85rem', letterSpacing: '-0.02em' }}>
-                {activeDay.theme || 'Exploration & Activities'}
-              </h2>
-              {activeDay.date && (
-                <span style={{ fontSize: '0.92rem', color: '#94a3b8', marginTop: '0.35rem', display: 'block' }}>
-                  {activeDay.date}
+          <div className="split-itinerary-layout">
+            {/* Left Column: Itinerary Details */}
+            <div className="glass-card" style={{ padding: '2.25rem', borderRadius: '24px' }}>
+              <div style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.1)', paddingBottom: '1.25rem', marginBottom: '1.75rem' }}>
+                <span style={{ backgroundColor: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', fontWeight: 800, fontSize: '0.82rem', padding: '0.4rem 0.9rem', borderRadius: '9999px', textTransform: 'uppercase', letterSpacing: '0.06em', border: '1px solid rgba(56, 189, 248, 0.3)' }}>
+                  Day {activeDay.day_number || activeDayTab} Schedule
                 </span>
-              )}
+                <h2 style={{ fontSize: '1.85rem', fontWeight: 850, color: '#ffffff', marginTop: '0.85rem', letterSpacing: '-0.02em' }}>
+                  {activeDay.theme || 'Exploration & Activities'}
+                </h2>
+                {activeDay.date && (
+                  <span style={{ fontSize: '0.92rem', color: '#94a3b8', marginTop: '0.35rem', display: 'block' }}>
+                    {activeDay.date}
+                  </span>
+                )}
+              </div>
+
+              {/* Activities List */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                {activeDay.activities?.map((act, actIdx) => {
+                  const isHovered = hoveredActivityIndex === actIdx;
+                  return (
+                    <div 
+                      key={actIdx} 
+                      className={`activity-card activity-card-interactive ${isHovered ? 'active-hover' : ''}`}
+                      onMouseEnter={() => setHoveredActivityIndex(actIdx)}
+                      onMouseLeave={() => setHoveredActivityIndex(null)}
+                      style={{
+                        display: 'flex',
+                        gap: '1.25rem',
+                        padding: '1.35rem',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <div className="activity-time-badge" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.2rem' }}>
+                        <span style={{ fontSize: '0.72rem', opacity: 0.85 }}>STOP #{actIdx + 1}</span>
+                        <span>{act.time_slot || 'Activity'}</span>
+                      </div>
+
+                      <div style={{ flex: 1 }}>
+                        <h3 style={{ margin: '0 0 0.45rem 0', fontSize: '1.2rem', fontWeight: 700, color: '#ffffff' }}>
+                          {act.title}
+                        </h3>
+                        <p style={{ margin: '0 0 0.85rem 0', fontSize: '0.94rem', color: '#cbd5e1', lineHeight: 1.55 }}>
+                          {act.description}
+                        </p>
+
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.25rem', fontSize: '0.88rem', color: '#94a3b8' }}>
+                          {act.location && (
+                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', color: '#e2e8f0' }}>
+                              <MapPin size={15} color="#38bdf8" /> {act.location}
+                            </span>
+                          )}
+                          {act.cost_estimate && (
+                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', fontWeight: 700, color: '#34d399' }}>
+                              <Coins size={15} /> {formatCost(act.cost_estimate)}
+                            </span>
+                          )}
+                        </div>
+
+                        {act.travel_tips && (
+                          <div className="activity-tip" style={{ marginTop: '0.85rem' }}>
+                            <strong>Local Tip:</strong> {act.travel_tips}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
 
-            {/* Activities List */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-              {activeDay.activities?.map((act, actIdx) => (
-                <div 
-                  key={actIdx} 
-                  className="activity-card"
-                  style={{
-                    display: 'flex',
-                    gap: '1.5rem',
-                    padding: '1.5rem',
-                  }}
-                >
-                  <div className="activity-time-badge">
-                    {act.time_slot || 'Activity'}
-                  </div>
-
-                  <div style={{ flex: 1 }}>
-                    <h3 style={{ margin: '0 0 0.45rem 0', fontSize: '1.25rem', fontWeight: 700, color: '#ffffff' }}>
-                      {act.title}
-                    </h3>
-                    <p style={{ margin: '0 0 1rem 0', fontSize: '0.96rem', color: '#cbd5e1', lineHeight: 1.6 }}>
-                      {act.description}
-                    </p>
-
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5rem', fontSize: '0.9rem', color: '#94a3b8' }}>
-                      {act.location && (
-                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', color: '#e2e8f0' }}>
-                          <MapPin size={16} color="#60a5fa" /> {act.location}
-                        </span>
-                      )}
-                      {act.cost_estimate && (
-                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', fontWeight: 700, color: '#10b981' }}>
-                          <Coins size={16} /> {formatCost(act.cost_estimate)}
-                        </span>
-                      )}
-                    </div>
-
-                    {act.travel_tips && (
-                      <div className="activity-tip">
-                        <strong>Local Tip:</strong> {act.travel_tips}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ))}
+            {/* Right Column: Sticky Interactive Leaflet Map */}
+            <div className="map-sticky-sidebar">
+              <ItineraryInteractiveMap
+                activities={activeDay.activities || []}
+                destination={trip.destination || ''}
+                hoveredIndex={hoveredActivityIndex}
+                onMarkerClick={(idx) => setHoveredActivityIndex(idx)}
+                activeDayNumber={activeDay.day_number || activeDayTab}
+              />
             </div>
           </div>
         ) : null}

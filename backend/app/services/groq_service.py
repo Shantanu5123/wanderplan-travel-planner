@@ -46,12 +46,15 @@ class GroqItineraryService:
             '          "description": "string (informative, practical overview)",\n'
             '          "location": "string (specific area, neighborhood or landmark)",\n'
             '          "cost_estimate": "string (e.g. Free, $15, $30)",\n'
-            '          "travel_tips": "string (practical advice, best timing, transit tip)"\n'
+            '          "travel_tips": "string (practical advice, best timing, transit tip)",\n'
+            '          "latitude": 35.6762,\n'
+            '          "longitude": 139.6503\n'
             "        }\n"
             "      ]\n"
             "    }\n"
             "  ]\n"
             "}\n"
+            "Crucial: Provide realistic, accurate floating-point latitude and longitude coordinates for each attraction/stop so they map precisely.\n"
             "Do not include any markdown formatting, preamble, or notes outside the JSON."
         )
 
@@ -103,10 +106,13 @@ class GroqItineraryService:
             '      "description": "string",\n'
             '      "location": "string",\n'
             '      "cost_estimate": "string",\n'
-            '      "travel_tips": "string"\n'
+            '      "travel_tips": "string",\n'
+            '      "latitude": 35.6762,\n'
+            '      "longitude": 139.6503\n'
             "    }\n"
             "  ]\n"
-            "}"
+            "}\n"
+            "Crucial: Provide realistic, accurate floating-point latitude and longitude coordinates for each attraction/stop so they map precisely."
         )
 
         user_content = (

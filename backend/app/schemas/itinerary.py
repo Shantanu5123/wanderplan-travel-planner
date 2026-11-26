@@ -10,6 +10,8 @@ class Activity(BaseModel):
     location: str = Field(..., description="Place, attraction, or neighbourhood")
     cost_estimate: Optional[str] = Field(None, description="e.g. Free, $15, $30-50")
     travel_tips: Optional[str] = Field(None, description="Helpful tips, e.g. booking in advance")
+    latitude: Optional[float] = Field(None, description="Geographic latitude coordinate of the stop")
+    longitude: Optional[float] = Field(None, description="Geographic longitude coordinate of the stop")
 
 
 class DayPlan(BaseModel):
