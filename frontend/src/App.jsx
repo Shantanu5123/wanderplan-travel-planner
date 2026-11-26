@@ -4,6 +4,7 @@ import { CurrencyProvider } from './context/CurrencyContext';
 import { LanguageProvider, useLanguage } from './context/LanguageContext';
 import { HashRouter, useRouter } from './services/router';
 import Navbar from './components/Navbar';
+import Footer from './components/Footer';
 import TripPlanningForm from './components/TripPlanningForm';
 import FloatingChatbot from './components/FloatingChatbot';
 import CursorGlow from './components/CursorGlow';
@@ -14,6 +15,7 @@ import ExplorePage from './pages/ExplorePage';
 import TripDetailPage from './pages/TripDetailPage';
 import SavedDestinationsPage from './pages/SavedDestinationsPage';
 import SettingsPage from './pages/SettingsPage';
+import PublicLandingPage from './pages/PublicLandingPage';
 import { Sparkles, Loader2 } from 'lucide-react';
 
 function HomePlanner() {
@@ -38,7 +40,7 @@ function HomePlanner() {
 }
 
 function RouterOutlet() {
-  const { currentPath } = useRouter();
+  const { currentPath, navigate } = useRouter();
   const { user, loading } = useAuth();
 
   // If auth state is still initializing
@@ -51,8 +53,8 @@ function RouterOutlet() {
     );
   }
 
-  // When opening the website without being logged in, show the Login page first!
-  if (!user && (currentPath === '/' || currentPath === '/login')) {
+  // Explicit Authentication Routes
+  if (currentPath === '/login') {
     return <LoginPage />;
   }
 
@@ -60,11 +62,21 @@ function RouterOutlet() {
     return <SignupPage />;
   }
 
-  if (currentPath === '/login') {
-    return <LoginPage />;
+  // Public Landing Page at root `/`
+  if (currentPath === '/') {
+    return <PublicLandingPage onQuickStart={() => navigate('/plan')} />;
+  }
+
+  // Planner page (accessible publicly or when logged in)
+  if (currentPath === '/plan') {
+    return <HomePlanner />;
   }
 
   if (currentPath === '/dashboard') {
+    // If not logged in, prompt user to log in or guest explore
+    if (!user) {
+      return <LoginPage />;
+    }
     return <DashboardPage />;
   }
 
@@ -86,8 +98,8 @@ function RouterOutlet() {
     return <TripDetailPage tripId={tripId} />;
   }
 
-  // Logged-in Home
-  return <HomePlanner />;
+  // Fallback to Public Landing Page
+  return <PublicLandingPage onQuickStart={() => navigate('/plan')} />;
 }
 
 function App() {
@@ -96,12 +108,17 @@ function App() {
       <CurrencyProvider>
         <LanguageProvider>
           <HashRouter>
-            <div className="app-shell">
+            <div className="app-shell flex flex-col min-h-screen">
               {/* Interactive Cursor Spotlight Glow */}
               <CursorGlow />
 
               <Navbar />
-              <RouterOutlet />
+              <div className="flex-grow">
+                <RouterOutlet />
+              </div>
+
+              {/* Global Responsive Minimal Footer */}
+              <Footer />
 
               {/* Persistent Bottom-Right "Ask WanderBot" Floating AI Widget */}
               <FloatingChatbot />

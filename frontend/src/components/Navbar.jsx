@@ -65,7 +65,7 @@ export default function Navbar() {
 
           {/* Nav Links with Multilingual Support */}
           <div className="nav-links">
-            <Link to="/" className={`nav-link ${currentPath === '/' ? 'active' : ''}`}>
+            <Link to="/plan" className={`nav-link ${currentPath === '/plan' ? 'active' : ''}`}>
               <Compass size={16} />
               {t('planTrip')}
             </Link>
