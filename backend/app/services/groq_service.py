@@ -64,15 +64,20 @@ class GroqItineraryService:
             "Do not include any markdown formatting, preamble, or notes outside the JSON."
         )
 
-        user_content = (
-            f"Plan a trip with the following parameters:\n"
-            f"- Destination: {req.destination}\n"
-            f"- Travel Dates: {req.start_date} to {req.end_date}\n"
-            f"- Budget Tier: {req.budget}\n"
-            f"- Travel Pace & Style: {req.travel_style}\n"
-            f"- Traveler Interests: {', '.join(req.interests)}\n"
-            f"Ensure each day has 2-4 well-sequenced activities matching the travel pace."
-        )
+        user_content_lines = [
+            f"- Destination: {req.destination}",
+            f"- Travel Dates: {req.start_date} to {req.end_date}",
+            f"- Budget Tier: {req.budget}",
+            f"- Travel Pace & Style: {req.travel_style}",
+            f"- Traveler Interests: {', '.join(req.interests)}",
+        ]
+        if req.dietary_notes:
+            user_content_lines.append(f"- Dietary Requirements & Food Preferences: {req.dietary_notes}")
+        if req.mobility_notes:
+            user_content_lines.append(f"- Accessibility & Mobility Preferences: {req.mobility_notes}")
+        user_content_lines.append("Ensure each day has 2-4 well-sequenced activities matching the travel pace, dietary requirements, and mobility needs.")
+
+        user_content = "Plan a trip with the following parameters:\n" + "\n".join(user_content_lines)
 
         response = self.client.chat.completions.create(
             model=self.model,

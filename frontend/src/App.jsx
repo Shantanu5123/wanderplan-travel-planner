@@ -12,6 +12,8 @@ import SignupPage from './pages/SignupPage';
 import DashboardPage from './pages/DashboardPage';
 import ExplorePage from './pages/ExplorePage';
 import TripDetailPage from './pages/TripDetailPage';
+import SavedDestinationsPage from './pages/SavedDestinationsPage';
+import SettingsPage from './pages/SettingsPage';
 import { Sparkles, Loader2 } from 'lucide-react';
 
 function HomePlanner() {
@@ -68,6 +70,14 @@ function RouterOutlet() {
 
   if (currentPath === '/explore') {
     return <ExplorePage />;
+  }
+
+  if (currentPath === '/saved') {
+    return <SavedDestinationsPage />;
+  }
+
+  if (currentPath === '/settings') {
+    return <SettingsPage />;
   }
 
   if (currentPath.startsWith('/trip')) {

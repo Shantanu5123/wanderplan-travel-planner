@@ -127,10 +127,19 @@ export default function Navbar() {
                       className="dropdown-item"
                       onClick={() => {
                         setDropdownOpen(false);
-                        navigate('/explore');
+                        navigate('/saved');
                       }}
                     >
                       <Heart size={16} /> {t('savedDestinations')}
+                    </button>
+                    <button
+                      className="dropdown-item"
+                      onClick={() => {
+                        setDropdownOpen(false);
+                        navigate('/settings');
+                      }}
+                    >
+                      <Settings size={16} /> Preferences & Settings
                     </button>
                     <div className="dropdown-divider" />
                     <button className="dropdown-item logout" onClick={handleLogout}>

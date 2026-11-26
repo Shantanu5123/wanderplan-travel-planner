@@ -11,6 +11,8 @@ class TripCreateRequest(BaseModel):
     budget: str = Field(..., example="moderate", description="budget, moderate, or luxury")
     interests: List[str] = Field(..., example=["temples", "food", "nature", "photography"])
     travel_style: str = Field(..., example="relaxed", description="relaxed, fast-paced, balanced, adventure")
+    dietary_notes: Optional[str] = Field(None, example="Vegetarian, no shellfish")
+    mobility_notes: Optional[str] = Field(None, example="Prefer accessible routes, minimal steep stairs")
 
 
 class TripResponse(BaseModel):

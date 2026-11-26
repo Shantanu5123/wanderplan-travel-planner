@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   MapPin, 
   Calendar, 
@@ -7,12 +7,14 @@ import {
   Heart, 
   Loader2, 
   AlertCircle, 
-  Sparkles 
+  Sparkles,
+  Sliders
 } from 'lucide-react';
 import { generateItinerary } from '../services/api';
 import ItineraryView from './ItineraryView';
 import { useRouter } from '../services/router';
 import { useLanguage } from '../context/LanguageContext';
+import { getUserPreferences } from '../services/preferencesService';
 
 const AVAILABLE_INTERESTS = [
   'History & Culture',
@@ -76,6 +78,27 @@ export default function TripPlanningForm() {
   const [loading, setLoading] = useState(false);
   const [apiError, setApiError] = useState(null);
   const [generatedTrip, setGeneratedTrip] = useState(null);
+  const [userPrefs, setUserPrefs] = useState(null);
+
+  // Load user saved preferences on mount
+  useEffect(() => {
+    async function loadPrefs() {
+      try {
+        const prefs = await getUserPreferences();
+        if (prefs) {
+          setUserPrefs(prefs);
+          setFormData((prev) => ({
+            ...prev,
+            budget: prev.budget === 'moderate' && prefs.default_budget ? prefs.default_budget : prev.budget,
+            travelStyle: prev.travelStyle === 'balanced' && prefs.default_pace ? prefs.default_pace : prev.travelStyle,
+          }));
+        }
+      } catch (err) {
+        console.warn('Could not load preferences:', err);
+      }
+    }
+    loadPrefs();
+  }, []);
 
   const validate = () => {
     const newErrors = {};
@@ -140,6 +163,8 @@ export default function TripPlanningForm() {
         budget: formData.budget,
         interests: formData.interests,
         travel_style: formData.travelStyle,
+        dietary_notes: userPrefs?.dietary_notes || undefined,
+        mobility_notes: userPrefs?.mobility_notes || undefined,
       };
 
       const result = await generateItinerary(payload);

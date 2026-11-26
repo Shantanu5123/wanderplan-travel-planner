@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useRouter } from '../services/router';
 import { useAuth } from '../context/AuthContext';
 import { useCurrency } from '../context/CurrencyContext';
+import { getSavedDestinations, toggleSaveDestination } from '../services/preferencesService';
 import { supabase } from '../services/supabaseClient';
 import { 
   Sparkles, 
@@ -366,6 +367,30 @@ export default function ExplorePage() {
   const [saveLoadingId, setSaveLoadingId] = useState(null);
   const [savedSuccessId, setSavedSuccessId] = useState(null);
   const [loadedImages, setLoadedImages] = useState({});
+  const [bookmarkedMap, setBookmarkedMap] = useState({});
+
+  useEffect(() => {
+    async function loadBookmarks() {
+      const items = await getSavedDestinations(user);
+      const map = {};
+      items.forEach((it) => {
+        const key = it.slug || it.id;
+        if (key) map[key] = true;
+      });
+      setBookmarkedMap(map);
+    }
+    loadBookmarks();
+  }, [user]);
+
+  const handleToggleBookmark = async (e, tripItem) => {
+    e.stopPropagation();
+    const isNowSaved = await toggleSaveDestination(user, tripItem);
+    const key = tripItem.slug || tripItem.id;
+    setBookmarkedMap((prev) => ({
+      ...prev,
+      [key]: isNowSaved,
+    }));
+  };
 
   const categories = ['All', 'Cultural', 'Romantic', 'Adventure', 'Food & Art', 'Luxury & Modern', 'Beaches & Heritage'];
 
@@ -639,8 +664,22 @@ export default function ExplorePage() {
                     <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.2) 0%, rgba(9, 13, 22, 0.9) 100%)', zIndex: 2 }} />
 
                     {/* Badge */}
-                    <div style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'rgba(0, 0, 0, 0.75)', backdropFilter: 'blur(6px)', padding: '0.35rem 0.85rem', borderRadius: '9999px', color: '#00f59b', fontSize: '0.78rem', fontWeight: 800, border: '1px solid rgba(0, 245, 155, 0.35)', zIndex: 3 }}>
-                      {trip.badge}
+                    <div style={{ position: 'absolute', top: '1rem', right: '1rem', display: 'flex', alignItems: 'center', gap: '0.45rem', zIndex: 3 }}>
+                      <button
+                        onClick={(e) => handleToggleBookmark(e, trip)}
+                        className="bookmark-heart-btn"
+                        title={bookmarkedMap[trip.slug || trip.id] ? 'Remove from Saved Destinations' : 'Save to Bookmarks'}
+                      >
+                        <Heart 
+                          size={16} 
+                          fill={bookmarkedMap[trip.slug || trip.id] ? '#ef4444' : 'transparent'} 
+                          color={bookmarkedMap[trip.slug || trip.id] ? '#ef4444' : '#ffffff'} 
+                        />
+                      </button>
+
+                      <div style={{ background: 'rgba(0, 0, 0, 0.75)', backdropFilter: 'blur(6px)', padding: '0.35rem 0.85rem', borderRadius: '9999px', color: '#00f59b', fontSize: '0.78rem', fontWeight: 800, border: '1px solid rgba(0, 245, 155, 0.35)' }}>
+                        {trip.badge}
+                      </div>
                     </div>
 
                     <div style={{ position: 'absolute', top: '1rem', left: '1rem', background: 'rgba(255, 0, 122, 0.85)', backdropFilter: 'blur(4px)', padding: '0.3rem 0.75rem', borderRadius: '9999px', color: '#ffffff', fontSize: '0.75rem', fontWeight: 800, zIndex: 3 }}>
