@@ -54,6 +54,9 @@ export default function TripDetailPage({ tripId }) {
   const [savedSuccess, setSavedSuccess] = useState(false);
   const [hoveredActivityIndex, setHoveredActivityIndex] = useState(null);
   const [swappingIndex, setSwappingIndex] = useState(null);
+  const [shareToast, setShareToast] = useState(null);
+  const [forkLoading, setForkLoading] = useState(false);
+  const [forkSuccess, setForkSuccess] = useState(false);
 
   // Setup sensors for DND-kit with pointer tolerance so clicks still work seamlessly
   const sensors = useSensors(
@@ -281,10 +284,102 @@ export default function TripDetailPage({ tripId }) {
     exportItineraryToPDF({ trip, itinerary, formatCost });
   };
 
-  const handleShare = () => {
-    navigator.clipboard.writeText(window.location.href);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  // 1. Share flow: Set is_public = true, build clean URL, copy to clipboard, and trigger toast
+  const handleShare = async () => {
+    let cleanUrl = window.location.href;
+
+    // If trip exists in Supabase, ensure is_public is set to true
+    if (trip.id && trip.id !== 'new' && !trip.id.startsWith('curated_')) {
+      try {
+        await supabase
+          .from('trips')
+          .update({ is_public: true })
+          .eq('id', trip.id);
+
+        setTrip((prev) => ({ ...prev, is_public: true }));
+      } catch (err) {
+        console.warn('Supabase share update notice:', err);
+      }
+      const baseUrl = window.location.origin + window.location.pathname;
+      cleanUrl = `${baseUrl}#/trip/${trip.id}`;
+    }
+
+    try {
+      await navigator.clipboard.writeText(cleanUrl);
+      setCopied(true);
+      setShareToast('Public share link copied to clipboard! Anyone with this link can view this itinerary.');
+      setTimeout(() => setCopied(false), 2500);
+      setTimeout(() => setShareToast(null), 4000);
+    } catch (e) {
+      alert('Share link: ' + cleanUrl);
+    }
+  };
+
+  // 2. Forking: Copy shared itinerary to visitor's own dashboard
+  const handleCopyToMyTrips = async () => {
+    if (!user) {
+      alert('Please sign in to copy this itinerary to your personal trips!');
+      navigate('/login');
+      return;
+    }
+
+    setForkLoading(true);
+    const newTripId = 'trip_' + Date.now();
+    const today = trip.start_date || new Date().toISOString().split('T')[0];
+    const endDate = trip.end_date || new Date(Date.now() + 3 * 86400000).toISOString().split('T')[0];
+
+    const forkedTrip = {
+      id: newTripId,
+      user_id: user.id,
+      destination: trip.destination,
+      start_date: today,
+      end_date: endDate,
+      budget: trip.budget || 'moderate',
+      travel_style: trip.travel_style || 'balanced',
+      interests: trip.interests || [],
+      itinerary_data: trip.itinerary_data,
+      is_public: false,
+      created_at: new Date().toISOString(),
+    };
+
+    // Save in local trips storage
+    try {
+      const stored = JSON.parse(localStorage.getItem('wanderplan_local_trips') || '[]');
+      localStorage.setItem('wanderplan_local_trips', JSON.stringify([forkedTrip, ...stored]));
+    } catch (e) {}
+
+    // Save to Supabase if logged-in real user
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(user.id);
+    if (isUuid && !user.isGuest) {
+      try {
+        const { data } = await supabase.from('trips').insert([
+          {
+            user_id: user.id,
+            destination: trip.destination,
+            start_date: today,
+            end_date: endDate,
+            budget: trip.budget || 'moderate',
+            travel_style: trip.travel_style || 'balanced',
+            interests: trip.interests || [],
+            itinerary_data: trip.itinerary_data,
+            is_public: false,
+          },
+        ]).select();
+
+        if (data?.[0]) {
+          forkedTrip.id = data[0].id;
+        }
+      } catch (err) {
+        console.warn('Supabase fork notice:', err);
+      }
+    }
+
+    setForkSuccess(true);
+    setForkLoading(false);
+    sessionStorage.setItem('viewing_trip', JSON.stringify(forkedTrip));
+    setTimeout(() => {
+      navigate('/dashboard');
+    }, 1200);
   };
 
   const handleDelete = async () => {
@@ -427,6 +522,9 @@ export default function TripDetailPage({ tripId }) {
   };
 
   const isExploreSample = Boolean(trip.fromExplore || (typeof trip.id === 'string' && trip.id.startsWith('curated_')));
+  // Determine if viewing a shared trip owned by another user
+  const isOwner = Boolean(user && trip?.user_id && user.id === trip.user_id);
+  const isSharedTripView = Boolean(trip?.is_public && !isOwner && !isExploreSample);
 
   return (
     <div style={{ width: '100%', minHeight: '100vh', padding: '2.5rem 1rem 6rem 1rem' }}>
@@ -498,6 +596,19 @@ export default function TripDetailPage({ tripId }) {
               </button>
             )}
 
+            {/* Public Shared Trip: Forking / Copy to My Trips button */}
+            {isSharedTripView && (
+              <button
+                onClick={handleCopyToMyTrips}
+                disabled={forkLoading || forkSuccess}
+                className="btn-glow"
+                style={{ padding: '0.6rem 1.3rem', background: 'linear-gradient(135deg, #38bdf8 0%, #34d399 100%)', color: '#030712', fontWeight: 800 }}
+              >
+                {forkLoading ? <Loader2 size={15} className="spinner" /> : (forkSuccess ? <Check size={15} /> : <BookmarkCheck size={15} />)}
+                {forkSuccess ? 'Copied to Your Trips!' : 'Copy to My Trips'}
+              </button>
+            )}
+
             <button onClick={handleExportPDF} className="btn-secondary" style={{ padding: '0.55rem 1.15rem' }}>
               <Download size={15} /> Download PDF Itinerary
             </button>
@@ -506,7 +617,7 @@ export default function TripDetailPage({ tripId }) {
               {copied ? 'Link Copied!' : 'Share Trip'}
             </button>
 
-            {!isExploreSample && trip.id && trip.id !== 'new' && (
+            {!isSharedTripView && !isExploreSample && trip.id && trip.id !== 'new' && (
               <button 
                 onClick={handleDelete} 
                 disabled={deleteLoading}
@@ -532,6 +643,22 @@ export default function TripDetailPage({ tripId }) {
             )}
           </div>
         </div>
+
+        {/* Toast Alert for Public Share */}
+        {shareToast && (
+          <div className="alert alert-info" style={{ animation: 'fadeIn 0.25s ease', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Share2 size={16} color="#38bdf8" />
+              <span>{shareToast}</span>
+            </div>
+            <button 
+              onClick={() => setShareToast(null)} 
+              style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: '0.2rem' }}
+            >
+              ✕
+            </button>
+          </div>
+        )}
 
         {/* Live Weather Forecast Bar (Open-Meteo) */}
         <LiveWeatherBar
