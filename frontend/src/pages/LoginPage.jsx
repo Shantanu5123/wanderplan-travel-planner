@@ -14,10 +14,18 @@ import {
   Sparkles, 
   ArrowRight,
   Globe2,
-  Ticket,
+  Calendar,
+  ShieldCheck,
+  Star,
   Luggage,
-  ShieldCheck
+  Users
 } from 'lucide-react';
+
+const FEATURED_DESTINATIONS = [
+  { name: 'Kyoto, Japan', tag: 'Cultural Haven', img: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=500&auto=format&fit=crop&q=80' },
+  { name: 'Santorini, Greece', tag: 'Sunset Views', img: 'https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=500&auto=format&fit=crop&q=80' },
+  { name: 'Swiss Alps', tag: 'Mountain Escape', img: 'https://images.unsplash.com/photo-1530122037265-a5f1f91d3b99?w=500&auto=format&fit=crop&q=80' }
+];
 
 export default function LoginPage() {
   const { signIn, loginAsGuest } = useAuth();
@@ -76,89 +84,123 @@ export default function LoginPage() {
 
   return (
     <div className="travel-auth-container">
-      {/* Dynamic Ambient Background Glows */}
+      {/* Immersive cinematic background hero with dark travel overlay */}
+      <div className="travel-hero-bg-backdrop" />
       <div className="travel-auth-glow-1" />
       <div className="travel-auth-glow-2" />
 
-      <div className="travel-auth-wrapper">
+      <div className="travel-auth-wrapper travel-first-look-card">
         
-        {/* Left Side: Travel Passport / Boarding Pass Showcase */}
-        <div className="travel-showcase-panel">
-          <div className="showcase-top-badge">
-            <Plane size={15} className="plane-fly-anim" /> Wanderer Boarding Pass
+        {/* Left Side: Editorial Travel Showcase */}
+        <div className="travel-showcase-panel editorial-layout">
+          <div className="showcase-header-row">
+            <div className="brand-pill-badge">
+              <Compass size={16} className="brand-spin-icon" />
+              <span>WanderPlan AI</span>
+            </div>
+            <div className="rating-pill">
+              <Star size={13} fill="#f59e0b" color="#f59e0b" />
+              <span>4.9 / 5 by 20,000+ Travelers</span>
+            </div>
           </div>
 
           <div className="showcase-content">
-            <h2 className="showcase-heading">
-              Ready for your next <span className="highlight-text">escape?</span>
-            </h2>
-            <p className="showcase-sub">
-              Your gateway to AI-curated journeys, customized daily routes, and secret hidden spots around the globe.
+            <h1 className="showcase-editorial-title">
+              Craft unforgettable journeys in <span className="highlight-gradient">seconds</span>.
+            </h1>
+            <p className="showcase-editorial-sub">
+              Your personal AI travel concierge. Discover secret viewpoints, tailor realistic schedules, and budget like a local globetrotter.
             </p>
 
-            {/* Boarding Pass Ticket Mock */}
-            <div className="boarding-ticket">
-              <div className="ticket-header">
+            {/* Live Trending Destinations Showcase Ribbon */}
+            <div className="destinations-showcase-row">
+              {FEATURED_DESTINATIONS.map((dest, i) => (
+                <div key={i} className="destination-preview-chip">
+                  <img src={dest.img} alt={dest.name} className="dest-chip-thumb" />
+                  <div className="dest-chip-info">
+                    <span className="dest-chip-name">{dest.name}</span>
+                    <span className="dest-chip-tag">{dest.tag}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Travel Value Highlights Grid */}
+            <div className="travel-features-grid">
+              <div className="feature-grid-item">
+                <div className="feature-icon-wrapper">
+                  <Sparkles size={17} color="#38bdf8" />
+                </div>
                 <div>
-                  <span className="ticket-label">PASSENGER</span>
-                  <span className="ticket-val">Wanderer / Explorer</span>
-                </div>
-                <div style={{ textAlign: 'right' }}>
-                  <span className="ticket-label">FLIGHT / CLASS</span>
-                  <span className="ticket-val" style={{ color: '#00f59b' }}>WP-2026 • VIP</span>
+                  <h4>AI Day-by-Day Itineraries</h4>
+                  <p>Smart geo-optimized routes tailored to your pace.</p>
                 </div>
               </div>
 
-              <div className="ticket-route">
-                <div className="route-stop">
-                  <span className="airport-code">CURRENT</span>
-                  <span className="city-name">Your Location</span>
+              <div className="feature-grid-item">
+                <div className="feature-icon-wrapper">
+                  <MapPin size={17} color="#34d399" />
                 </div>
-                <div className="route-plane">
-                  <div className="dotted-line" />
-                  <Plane size={18} className="plane-mid" />
-                </div>
-                <div className="route-stop" style={{ textAlign: 'right' }}>
-                  <span className="airport-code" style={{ color: '#ff007a' }}>DREAM</span>
-                  <span className="city-name">Any Destination</span>
+                <div>
+                  <h4>Hidden Gems & Local Spots</h4>
+                  <p>Skip generic tourist traps with verified gems.</p>
                 </div>
               </div>
 
-              <div className="ticket-perks">
-                <div className="perk-item">
-                  <Sparkles size={13} color="#00f59b" /> Instant AI Itineraries
+              <div className="feature-grid-item">
+                <div className="feature-icon-wrapper">
+                  <Globe2 size={17} color="#818cf8" />
                 </div>
-                <div className="perk-item">
-                  <MapPin size={13} color="#ff6a00" /> Hidden Spots & Geo-Scout
+                <div>
+                  <h4>Multi-Currency & Weather</h4>
+                  <p>Real-time exchange conversion & live forecasts.</p>
                 </div>
-                <div className="perk-item">
-                  <Globe2 size={13} color="#00d2ff" /> Multi-Currency Budgeting
-                </div>
-              </div>
-
-              <div className="ticket-barcode">
-                <div className="barcode-lines" />
-                <span className="barcode-number">WNDR-PLN-SECURE-AUTH-2026</span>
               </div>
             </div>
+          </div>
 
-            {/* Travel Quote */}
-            <div className="travel-quote">
-              <Compass size={18} color="#00f59b" />
-              <span>"Jobs fill your pocket, but adventures fill your soul."</span>
+          {/* Social Proof Quote */}
+          <div className="showcase-footer-proof">
+            <div className="travelers-avatars">
+              <span className="avatar-chip a1">✈️</span>
+              <span className="avatar-chip a2">🎒</span>
+              <span className="avatar-chip a3">📸</span>
             </div>
+            <p className="proof-text">
+              "WanderPlan planned our 7-day trip to Switzerland flawlessly. Best travel tool I've used!"
+            </p>
           </div>
         </div>
 
-        {/* Right Side: Glassmorphic Login Form */}
+        {/* Right Side: Sleek Modern Traveler Login Form */}
         <div className="travel-form-panel">
           <div className="form-inner">
             <div className="form-brand-header">
               <div className="login-logo-pill">
-                <Compass size={22} color="#00f59b" />
+                <Luggage size={24} color="#38bdf8" />
               </div>
-              <h1 className="form-title">Explorer Sign In</h1>
-              <p className="form-subtitle">Welcome! Sign in to unlock AI trip generation, saved trips & itineraries.</p>
+              <h2 className="form-title">Welcome, Explorer</h2>
+              <p className="form-subtitle">Sign in to start creating your dream itineraries, view saved routes, and access smart budgets.</p>
+            </div>
+
+            {/* One-click Instant Guest Explorer Action */}
+            <div className="guest-quickstart-banner">
+              <div className="guest-banner-text">
+                <strong>Just exploring?</strong>
+                <span>Try the full planner without creating an account</span>
+              </div>
+              <button
+                type="button"
+                onClick={handleGuestContinue}
+                className="btn-guest-action"
+              >
+                <span>Continue as Guest</span>
+                <ArrowRight size={15} />
+              </button>
+            </div>
+
+            <div className="auth-divider-line">
+              <span>or sign in with email</span>
             </div>
 
             {serverError && (
@@ -171,13 +213,13 @@ export default function LoginPage() {
             <form onSubmit={handleSubmit} className="auth-form" noValidate>
               <div className="form-group">
                 <label htmlFor="login-email">
-                  <Mail size={15} color="#00f59b" /> Email Address
+                  <Mail size={15} color="#38bdf8" /> Email Address
                 </label>
                 <div className="input-with-icon">
                   <input
                     id="login-email"
                     type="email"
-                    placeholder="traveler@wanderplan.com"
+                    placeholder="e.g. explorer@wanderplan.com"
                     value={email}
                     onChange={(e) => {
                       setEmail(e.target.value);
@@ -193,14 +235,14 @@ export default function LoginPage() {
               <div className="form-group">
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <label htmlFor="login-password">
-                    <Lock size={15} color="#ff007a" /> Password
+                    <Lock size={15} color="#818cf8" /> Password
                   </label>
                 </div>
                 <div className="input-with-icon" style={{ position: 'relative' }}>
                   <input
                     id="login-password"
                     type={showPassword ? 'text' : 'password'}
-                    placeholder="••••••••••••"
+                    placeholder="Enter your password"
                     value={password}
                     onChange={(e) => {
                       setPassword(e.target.value);
@@ -223,39 +265,30 @@ export default function LoginPage() {
                 {errors.password && <span className="field-error">{errors.password}</span>}
               </div>
 
-              <button type="submit" className="btn-glow-large" disabled={loading} style={{ marginTop: '0.5rem' }}>
+              <button type="submit" className="btn-glow-large submit-auth-btn" disabled={loading}>
                 {loading ? (
                   <>
                     <Loader2 size={18} className="spinner" />
-                    Boarding & Signing In...
+                    <span>Signing in...</span>
                   </>
                 ) : (
                   <>
-                    <span>Sign In & Start Planning</span>
+                    <span>Sign In to WanderPlan</span>
                     <ArrowRight size={17} />
                   </>
                 )}
-              </button>
-
-              <button
-                type="button"
-                onClick={handleGuestContinue}
-                className="btn-secondary"
-                style={{ width: '100%', justifyContent: 'center', marginTop: '0.75rem', padding: '0.75rem 1rem' }}
-              >
-                Continue as Guest Explorer →
               </button>
             </form>
 
             <div className="auth-footer-notes">
               <p>
-                Don't have an account yet?{' '}
+                New here?{' '}
                 <Link to="/signup" className="auth-neon-link">
                   Create Traveler Account
                 </Link>
               </p>
               <div className="security-guarantee">
-                <ShieldCheck size={14} color="#00f59b" /> Encrypted & Secured by Supabase Cloud Auth
+                <ShieldCheck size={14} color="#34d399" /> 100% Free to start • Instant Itinerary Generation
               </div>
             </div>
           </div>
