@@ -1668,7 +1668,115 @@ body {
   background: rgba(255, 255, 255, 0.96) !important;
 }
 
-/* Interactive Activity Item Hover Highlight */
+/* Drag and drop grip and interactive activity buttons */
+.drag-handle-grip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+  color: #64748b;
+  padding: 0.25rem;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+}
+
+.drag-handle-grip:hover {
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.1);
+}
+
+.drag-handle-grip:active {
+  cursor: grabbing;
+}
+
+.act-action-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #cbd5e1;
+  padding: 0.3rem 0.65rem;
+  border-radius: 8px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.act-action-pill:hover {
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+}
+
+.act-action-pill.swap-btn:hover {
+  background: rgba(56, 189, 248, 0.18);
+  border-color: rgba(56, 189, 248, 0.4);
+  color: #38bdf8;
+}
+
+.act-action-pill.note-btn:hover {
+  background: rgba(245, 158, 11, 0.18);
+  border-color: rgba(245, 158, 11, 0.4);
+  color: #fde68a;
+}
+
+.act-action-pill.delete-btn:hover {
+  background: rgba(239, 68, 68, 0.18);
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #f87171;
+}
+
+.activity-personal-note-display {
+  margin-top: 0.75rem;
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  border-radius: 8px;
+  padding: 0.5rem 0.85rem;
+  font-size: 0.84rem;
+  color: #fef3c7;
+}
+
+.activity-note-form {
+  margin-top: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.note-input-field {
+  flex: 1;
+  background: rgba(8, 14, 28, 0.85);
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  border-radius: 8px;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.85rem;
+  color: #ffffff;
+  outline: none;
+}
+
+.note-save-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: #38bdf8;
+  color: #030712;
+  border: none;
+  font-size: 0.78rem;
+  font-weight: 750;
+  padding: 0.45rem 0.75rem;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.note-cancel-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: none;
+  color: #94a3b8;
+  padding: 0.45rem 0.55rem;
+  border-radius: 8px;
+  cursor: pointer;
+}
 .activity-card-interactive {
   transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
   border: 1px solid rgba(255, 255, 255, 0.1);

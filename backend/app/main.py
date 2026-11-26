@@ -91,6 +91,11 @@ app.add_middleware(
 app.include_router(itineraries.router)
 app.include_router(chat.router)
 
+# Direct alias for /api/swap-activity as requested in prompt
+@app.post("/api/swap-activity")
+def swap_activity_direct(req: itineraries.SwapActivityRequest):
+    return itineraries.swap_activity_endpoint(req)
+
 
 @app.get("/", tags=["Root"])
 def root():

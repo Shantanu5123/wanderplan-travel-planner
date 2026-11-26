@@ -4,9 +4,25 @@ import { useAuth } from '../context/AuthContext';
 import { supabase } from '../services/supabaseClient';
 import { useCurrency } from '../context/CurrencyContext';
 import { exportItineraryToPDF } from '../services/pdfExporter';
+import { swapActivity } from '../services/api';
 import ItineraryInteractiveMap from '../components/ItineraryInteractiveMap';
 import LiveWeatherBar from '../components/LiveWeatherBar';
 import PackingListDrawer from '../components/PackingListDrawer';
+import SortableActivityCard from '../components/SortableActivityCard';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
 import { 
   ArrowLeft, 
   Calendar, 
@@ -37,6 +53,75 @@ export default function TripDetailPage({ tripId }) {
   const [saveLoading, setSaveLoading] = useState(false);
   const [savedSuccess, setSavedSuccess] = useState(false);
   const [hoveredActivityIndex, setHoveredActivityIndex] = useState(null);
+  const [swappingIndex, setSwappingIndex] = useState(null);
+
+  // Setup sensors for DND-kit with pointer tolerance so clicks still work seamlessly
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  // Helper function to recalculate estimated trip cost from current itinerary activities
+  const recalculateTotalCost = (daysList) => {
+    let totalLow = 0;
+    let totalHigh = 0;
+    let count = 0;
+
+    daysList.forEach((day) => {
+      day.activities?.forEach((act) => {
+        if (!act.cost_estimate) return;
+        const matches = act.cost_estimate.match(/\d+[\d,]*/g);
+        if (matches && matches.length > 0) {
+          const numbers = matches.map((m) => parseFloat(m.replace(/,/g, ''))).filter((n) => !isNaN(n));
+          if (numbers.length === 1) {
+            totalLow += numbers[0];
+            totalHigh += numbers[0];
+            count++;
+          } else if (numbers.length >= 2) {
+            totalLow += numbers[0];
+            totalHigh += numbers[1];
+            count++;
+          }
+        }
+      });
+    });
+
+    if (count === 0) return null;
+    return totalLow === totalHigh ? `$${totalLow}` : `$${totalLow} - $${totalHigh}`;
+  };
+
+  // Persist updated trip state to local cache & Supabase
+  const persistTripUpdate = async (updatedTrip) => {
+    setTrip(updatedTrip);
+    sessionStorage.setItem('viewing_trip', JSON.stringify(updatedTrip));
+
+    // Update in localStorage if saved locally
+    try {
+      const localStored = JSON.parse(localStorage.getItem('wanderplan_local_trips') || '[]');
+      const updatedLocal = localStored.map((t) => (t.id === updatedTrip.id ? updatedTrip : t));
+      localStorage.setItem('wanderplan_local_trips', JSON.stringify(updatedLocal));
+    } catch (e) {}
+
+    // Update in Supabase if real user & saved trip
+    if (user && !user.isGuest && updatedTrip.id && !updatedTrip.id.startsWith('curated_') && updatedTrip.id !== 'new') {
+      try {
+        await supabase
+          .from('trips')
+          .update({
+            itinerary_data: updatedTrip.itinerary_data,
+          })
+          .eq('id', updatedTrip.id);
+      } catch (e) {
+        console.warn('Supabase trip update error:', e);
+      }
+    }
+  };
 
   useEffect(() => {
     async function loadTrip() {
@@ -218,6 +303,129 @@ export default function TripDetailPage({ tripId }) {
     }
   };
 
+  // 1. Drag and Drop reorder handling
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id || !activeDay) return;
+
+    const oldIndex = activeDay.activities.findIndex((_, idx) => `act-${activeDayTab}-${idx}` === active.id);
+    const newIndex = activeDay.activities.findIndex((_, idx) => `act-${activeDayTab}-${idx}` === over.id);
+
+    if (oldIndex !== -1 && newIndex !== -1) {
+      const reordered = arrayMove(activeDay.activities, oldIndex, newIndex);
+      // Re-assign appropriate time slot based on position
+      const slots = ['Morning', 'Afternoon', 'Evening'];
+      const adjusted = reordered.map((item, idx) => ({
+        ...item,
+        time_slot: idx < slots.length ? slots[idx] : item.time_slot,
+      }));
+
+      const newDays = days.map((d) =>
+        (d.day_number || 1) === activeDayTab ? { ...d, activities: adjusted } : d
+      );
+
+      const newEstCost = recalculateTotalCost(newDays) || itinerary.estimated_total_cost;
+      const updatedTrip = {
+        ...trip,
+        itinerary_data: {
+          ...itinerary,
+          days: newDays,
+          estimated_total_cost: newEstCost,
+        },
+      };
+
+      persistTripUpdate(updatedTrip);
+    }
+  };
+
+  // 2. AI Swap Stop handler
+  const handleSwapActivity = async (actIndex, activityToSwap) => {
+    setSwappingIndex(actIndex);
+    try {
+      const res = await swapActivity({
+        destination: trip.destination,
+        current_activity: activityToSwap,
+        day_theme: activeDay?.theme || '',
+        budget: trip.budget || 'moderate',
+        interests: trip.interests || [],
+      });
+
+      if (res.activity) {
+        const updatedActivities = [...activeDay.activities];
+        updatedActivities[actIndex] = {
+          ...res.activity,
+          personal_note: activityToSwap.personal_note || '',
+        };
+
+        const newDays = days.map((d) =>
+          (d.day_number || 1) === activeDayTab ? { ...d, activities: updatedActivities } : d
+        );
+
+        const newEstCost = recalculateTotalCost(newDays) || itinerary.estimated_total_cost;
+        const updatedTrip = {
+          ...trip,
+          itinerary_data: {
+            ...itinerary,
+            days: newDays,
+            estimated_total_cost: newEstCost,
+          },
+        };
+
+        persistTripUpdate(updatedTrip);
+      }
+    } catch (err) {
+      console.error('Swap error:', err);
+      alert('Unable to swap activity right now. Please try again.');
+    } finally {
+      setSwappingIndex(null);
+    }
+  };
+
+  // 3. Delete activity stop & recalculate cost
+  const handleDeleteActivity = (actIndex) => {
+    if (!confirm('Remove this activity from Day ' + activeDayTab + '?')) return;
+    const updatedActivities = activeDay.activities.filter((_, idx) => idx !== actIndex);
+
+    const newDays = days.map((d) =>
+      (d.day_number || 1) === activeDayTab ? { ...d, activities: updatedActivities } : d
+    );
+
+    const newEstCost = recalculateTotalCost(newDays) || itinerary.estimated_total_cost;
+    const updatedTrip = {
+      ...trip,
+      itinerary_data: {
+        ...itinerary,
+        days: newDays,
+        estimated_total_cost: newEstCost,
+      },
+    };
+
+    persistTripUpdate(updatedTrip);
+  };
+
+  // 4. Save personal note
+  const handleSaveNote = (actIndex, note) => {
+    const updatedActivities = [...activeDay.activities];
+    updatedActivities[actIndex] = {
+      ...updatedActivities[actIndex],
+      personal_note: note,
+    };
+
+    const newDays = days.map((d) =>
+      (d.day_number || 1) === activeDayTab ? { ...d, activities: updatedActivities } : d
+    );
+
+    const updatedTrip = {
+      ...trip,
+      itinerary_data: {
+        ...itinerary,
+        days: newDays,
+      },
+    };
+
+    persistTripUpdate(updatedTrip);
+  };
+
   const isExploreSample = Boolean(trip.fromExplore || (typeof trip.id === 'string' && trip.id.startsWith('curated_')));
 
   return (
@@ -393,59 +601,39 @@ export default function TripDetailPage({ tripId }) {
                 )}
               </div>
 
-              {/* Activities List */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                {activeDay.activities?.map((act, actIdx) => {
-                  const isHovered = hoveredActivityIndex === actIdx;
-                  return (
-                    <div 
-                      key={actIdx} 
-                      className={`activity-card activity-card-interactive ${isHovered ? 'active-hover' : ''}`}
-                      onMouseEnter={() => setHoveredActivityIndex(actIdx)}
-                      onMouseLeave={() => setHoveredActivityIndex(null)}
-                      style={{
-                        display: 'flex',
-                        gap: '1.25rem',
-                        padding: '1.35rem',
-                        cursor: 'pointer',
-                      }}
-                    >
-                      <div className="activity-time-badge" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.2rem' }}>
-                        <span style={{ fontSize: '0.72rem', opacity: 0.85 }}>STOP #{actIdx + 1}</span>
-                        <span>{act.time_slot || 'Activity'}</span>
-                      </div>
-
-                      <div style={{ flex: 1 }}>
-                        <h3 style={{ margin: '0 0 0.45rem 0', fontSize: '1.2rem', fontWeight: 700, color: '#ffffff' }}>
-                          {act.title}
-                        </h3>
-                        <p style={{ margin: '0 0 0.85rem 0', fontSize: '0.94rem', color: '#cbd5e1', lineHeight: 1.55 }}>
-                          {act.description}
-                        </p>
-
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.25rem', fontSize: '0.88rem', color: '#94a3b8' }}>
-                          {act.location && (
-                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', color: '#e2e8f0' }}>
-                              <MapPin size={15} color="#38bdf8" /> {act.location}
-                            </span>
-                          )}
-                          {act.cost_estimate && (
-                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', fontWeight: 700, color: '#34d399' }}>
-                              <Coins size={15} /> {formatCost(act.cost_estimate)}
-                            </span>
-                          )}
-                        </div>
-
-                        {act.travel_tips && (
-                          <div className="activity-tip" style={{ marginTop: '0.85rem' }}>
-                            <strong>Local Tip:</strong> {act.travel_tips}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+              {/* Sortable & Editable Activities List with Drag-and-Drop */}
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEnd}
+              >
+                <SortableContext
+                  items={(activeDay.activities || []).map((_, idx) => `act-${activeDayTab}-${idx}`)}
+                  strategy={verticalListSortingStrategy}
+                >
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                    {activeDay.activities?.map((act, actIdx) => {
+                      const id = `act-${activeDayTab}-${actIdx}`;
+                      const isHovered = hoveredActivityIndex === actIdx;
+                      return (
+                        <SortableActivityCard
+                          key={id}
+                          id={id}
+                          activity={act}
+                          index={actIdx}
+                          isHovered={isHovered}
+                          onMouseEnter={() => setHoveredActivityIndex(actIdx)}
+                          onMouseLeave={() => setHoveredActivityIndex(null)}
+                          onSwap={handleSwapActivity}
+                          onDelete={handleDeleteActivity}
+                          onSaveNote={handleSaveNote}
+                          isSwapping={swappingIndex === actIdx}
+                        />
+                      );
+                    })}
+                  </div>
+                </SortableContext>
+              </DndContext>
             </div>
 
             {/* Right Column: Sticky Interactive Leaflet Map */}

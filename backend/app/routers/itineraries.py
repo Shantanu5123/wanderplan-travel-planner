@@ -1,10 +1,10 @@
 from fastapi import APIRouter, HTTPException
 from app.schemas.trip import TripCreateRequest
-from app.schemas.itinerary import ItineraryData, DayPlan
+from app.schemas.itinerary import ItineraryData, DayPlan, Activity
 from app.services.groq_service import groq_service
 from app.config import settings
 from pydantic import BaseModel
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 
 router = APIRouter(prefix="/api/v1/itineraries", tags=["Itineraries"])
 
@@ -14,6 +14,14 @@ class RegenerateDayRequest(BaseModel):
     current_day: Dict[str, Any]
     feedback: str
     trip_context: Dict[str, Any]
+
+
+class SwapActivityRequest(BaseModel):
+    destination: str
+    current_activity: Dict[str, Any]
+    day_theme: Optional[str] = ""
+    budget: Optional[str] = "moderate"
+    interests: Optional[List[str]] = None
 
 
 @router.post("/generate", response_model=Dict[str, Any])
@@ -70,3 +78,27 @@ def regenerate_day_endpoint(req: RegenerateDayRequest):
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Regeneration failed: {str(e)}")
+
+
+@router.post("/swap-activity", response_model=Dict[str, Any])
+def swap_activity_endpoint(req: SwapActivityRequest):
+    """
+    Generate an alternative activity replacement for a specific stop.
+    """
+    if not settings.GROQ_API_KEY:
+        raise HTTPException(status_code=500, detail="GROQ_API_KEY is not configured")
+
+    try:
+        new_activity = groq_service.swap_activity(
+            destination=req.destination,
+            current_activity=req.current_activity,
+            day_theme=req.day_theme or "",
+            budget=req.budget or "moderate",
+            interests=req.interests or [],
+        )
+        return {
+            "status": "success",
+            "activity": new_activity.dict()
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Swap activity failed: {str(e)}")

@@ -27,4 +27,12 @@ export async function generateItinerary(tripData) {
   return response.data;
 }
 
+/**
+ * AI Swap Stop: Returns a single fresh alternative activity for a stop
+ */
+export async function swapActivity(payload) {
+  const response = await apiClient.post('/itineraries/swap-activity', payload);
+  return response.data;
+}
+
 export default apiClient;

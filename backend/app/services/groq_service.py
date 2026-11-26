@@ -144,5 +144,57 @@ class GroqItineraryService:
         parsed["day_number"] = day_number
         return DayPlan(**parsed)
 
+    def swap_activity(self, destination: str, current_activity: Dict[str, Any], day_theme: str = "", budget: str = "moderate", interests: Optional[List[str]] = None) -> Activity:
+        """
+        Generates a single fresh alternative activity replacement stop matching the destination and time slot.
+        """
+        interests_str = ", ".join(interests) if interests else "Sightseeing, Local culture, Food"
+        time_slot = current_activity.get("time_slot", "Afternoon")
+        current_title = current_activity.get("title", "Current Attraction")
+
+        system_prompt = (
+            "You are an expert travel concierge. "
+            "Suggest ONE fresh, distinct alternative activity stop to replace an existing stop. "
+            "You MUST respond ONLY with valid JSON conforming to this schema:\n"
+            "{\n"
+            f'  "time_slot": "{time_slot}",\n'
+            '  "title": "string (name of the fresh alternative attraction/stop)",\n'
+            '  "description": "string (practical, engaging overview)",\n'
+            '  "location": "string (neighborhood or landmark name)",\n'
+            '  "cost_estimate": "string (e.g. Free, $15, $30)",\n'
+            '  "travel_tips": "string (pro tip for visiting)",\n'
+            '  "latitude": 35.6762,\n'
+            '  "longitude": 139.6503\n'
+            "}\n"
+            "Crucial: Provide realistic, accurate floating-point latitude and longitude coordinates for this specific place. "
+            "Ensure the replacement is exciting, realistically located in the destination, and different from the current stop.\n"
+            "Do not include any markdown formatting, preamble, or notes outside the JSON."
+        )
+
+        user_content = (
+            f"Destination: {destination}\n"
+            f"Day Theme: {day_theme}\n"
+            f"Time Slot: {time_slot}\n"
+            f"Current Activity to Replace: {current_title} - {current_activity.get('location', '')}\n"
+            f"Budget Tier: {budget}\n"
+            f"Traveler Interests: {interests_str}\n"
+            f"Please generate a unique, high-quality replacement stop."
+        )
+
+        response = self.client.chat.completions.create(
+            model=self.model,
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_content},
+            ],
+            temperature=0.8,
+            response_format={"type": "json_object"},
+        )
+
+        parsed = json.loads(response.choices[0].message.content)
+        parsed["time_slot"] = time_slot
+        return Activity(**parsed)
+
+
 
 groq_service = GroqItineraryService()
