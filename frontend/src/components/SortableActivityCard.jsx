@@ -10,14 +10,17 @@ import {
   Trash2, 
   Loader2, 
   Save, 
-  X 
+  X,
+  ExternalLink
 } from 'lucide-react';
 import { useCurrency } from '../context/CurrencyContext';
+import { buildGoogleMapsUrl } from '../services/bookingLinks';
 
 export default function SortableActivityCard({
   id,
   activity,
   index,
+  destination = '',
   isHovered,
   onMouseEnter,
   onMouseLeave,
@@ -117,7 +120,7 @@ export default function SortableActivityCard({
         </p>
 
         {/* Metadata info */}
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.25rem', fontSize: '0.88rem', color: '#94a3b8' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '1.25rem', fontSize: '0.88rem', color: '#94a3b8' }}>
           {activity.location && (
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', color: '#e2e8f0' }}>
               <MapPin size={14} color="#38bdf8" /> {activity.location}
@@ -128,6 +131,18 @@ export default function SortableActivityCard({
               <Coins size={14} /> {formatCost(activity.cost_estimate)}
             </span>
           )}
+          <a
+            href={buildGoogleMapsUrl(activity, destination)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="maps-deep-link"
+            title="Open stop in Google Maps"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <MapPin size={12} />
+            <span>Open in Maps</span>
+            <ExternalLink size={11} />
+          </a>
         </div>
 
         {activity.travel_tips && (

@@ -37,8 +37,12 @@ import {
   Clock, 
   Loader2,
   BookmarkCheck,
-  FileText
+  FileText,
+  Plane,
+  Building,
+  ExternalLink
 } from 'lucide-react';
+import { buildGoogleFlightsUrl, buildBookingHotelsUrl, buildGoogleHotelsUrl } from '../services/bookingLinks';
 
 export default function TripDetailPage({ tripId }) {
   const { navigate } = useRouter();
@@ -579,6 +583,48 @@ export default function TripDetailPage({ tripId }) {
                 </span>
               )}
             </div>
+
+            {/* Practical Action Bar: Book This Trip deep links */}
+            <div className="book-trip-action-bar">
+              <span className="book-bar-label">
+                <Sparkles size={14} color="#38bdf8" /> Book This Trip:
+              </span>
+              <a
+                href={buildGoogleFlightsUrl(trip.destination)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="booking-action-btn"
+                title={`Search flights to ${trip.destination} on Google Flights`}
+              >
+                <Plane size={14} color="#38bdf8" />
+                <span>Search Flights</span>
+                <ExternalLink size={12} />
+              </a>
+
+              <a
+                href={buildBookingHotelsUrl(trip.destination, trip.start_date, trip.end_date)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="booking-action-btn"
+                title={`Find hotels in ${trip.destination} on Booking.com`}
+              >
+                <Building size={14} color="#34d399" />
+                <span>Find Hotels</span>
+                <ExternalLink size={12} />
+              </a>
+
+              <a
+                href={buildGoogleHotelsUrl(trip.destination)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="booking-action-btn"
+                title={`Explore hotels in ${trip.destination} on Google Hotels`}
+              >
+                <Building size={14} color="#a78bfa" />
+                <span>Google Hotels</span>
+                <ExternalLink size={12} />
+              </a>
+            </div>
           </div>
 
           {/* Action Toolbar */}
@@ -748,6 +794,7 @@ export default function TripDetailPage({ tripId }) {
                           id={id}
                           activity={act}
                           index={actIdx}
+                          destination={trip.destination || ''}
                           isHovered={isHovered}
                           onMouseEnter={() => setHoveredActivityIndex(actIdx)}
                           onMouseLeave={() => setHoveredActivityIndex(null)}
