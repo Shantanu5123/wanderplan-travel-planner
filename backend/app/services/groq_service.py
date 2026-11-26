@@ -52,9 +52,15 @@ class GroqItineraryService:
             "        }\n"
             "      ]\n"
             "    }\n"
-            "  ]\n"
+            "  ],\n"
+            '  "packing_list": {\n'
+            '    "clothing": ["string", "string"],\n'
+            '    "essentials": ["string", "string"],\n'
+            '    "tech": ["string", "string"],\n'
+            '    "documents": ["string", "string"]\n'
+            "  }\n"
             "}\n"
-            "Crucial: Provide realistic, accurate floating-point latitude and longitude coordinates for each attraction/stop so they map precisely.\n"
+            "Crucial: Provide realistic, accurate floating-point latitude and longitude coordinates for each attraction/stop so they map precisely. Tailor the packing list directly to destination weather, local customs, and travel style.\n"
             "Do not include any markdown formatting, preamble, or notes outside the JSON."
         )
 

@@ -5,6 +5,8 @@ import { supabase } from '../services/supabaseClient';
 import { useCurrency } from '../context/CurrencyContext';
 import { exportItineraryToPDF } from '../services/pdfExporter';
 import ItineraryInteractiveMap from '../components/ItineraryInteractiveMap';
+import LiveWeatherBar from '../components/LiveWeatherBar';
+import PackingListDrawer from '../components/PackingListDrawer';
 import { 
   ArrowLeft, 
   Calendar, 
@@ -322,6 +324,22 @@ export default function TripDetailPage({ tripId }) {
             )}
           </div>
         </div>
+
+        {/* Live Weather Forecast Bar (Open-Meteo) */}
+        <LiveWeatherBar
+          latitude={activeDay?.activities?.[0]?.latitude || 48.8566}
+          longitude={activeDay?.activities?.[0]?.longitude || 2.3522}
+          startDate={trip.start_date}
+          endDate={trip.end_date}
+          destination={trip.destination}
+        />
+
+        {/* AI Packing List Interactive Drawer */}
+        <PackingListDrawer
+          packingList={itinerary.packing_list || trip.packing_list}
+          tripId={trip.id}
+          destination={trip.destination}
+        />
 
         {/* Day Tabs Switcher */}
         <div style={{ display: 'flex', gap: '0.75rem', overflowX: 'auto', padding: '0.25rem 0 0.5rem 0' }}>

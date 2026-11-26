@@ -21,8 +21,16 @@ class DayPlan(BaseModel):
     activities: List[Activity] = Field(default_factory=list)
 
 
+class PackingList(BaseModel):
+    clothing: List[str] = Field(default_factory=list, description="Clothing recommendations tailored to destination weather & style")
+    essentials: List[str] = Field(default_factory=list, description="Toiletries, medical, and daily essentials")
+    tech: List[str] = Field(default_factory=list, description="Electronics, adapters, power banks")
+    documents: List[str] = Field(default_factory=list, description="Passports, visas, insurance, booking passes")
+
+
 class ItineraryData(BaseModel):
     summary: str
     destination: str
     estimated_total_cost: Optional[str] = None
     days: List[DayPlan] = Field(default_factory=list)
+    packing_list: Optional[PackingList] = Field(default_factory=PackingList, description="AI-generated packing checklist")
