@@ -365,6 +365,7 @@ export default function ExplorePage() {
   const [activePreviewTrip, setActivePreviewTrip] = useState(null);
   const [saveLoadingId, setSaveLoadingId] = useState(null);
   const [savedSuccessId, setSavedSuccessId] = useState(null);
+  const [loadedImages, setLoadedImages] = useState({});
 
   const categories = ['All', 'Cultural', 'Romantic', 'Adventure', 'Food & Art', 'Luxury & Modern', 'Beaches & Heritage'];
 
@@ -383,6 +384,7 @@ export default function ExplorePage() {
   const handleViewFullTrip = (trip) => {
     const fullTripPayload = {
       id: trip.id,
+      fromExplore: true,
       destination: trip.destination,
       start_date: new Date().toISOString().split('T')[0],
       end_date: new Date(Date.now() + (trip.days.length - 1) * 86400000).toISOString().split('T')[0],
@@ -618,24 +620,35 @@ export default function ExplorePage() {
                 >
                   {/* Image Cover */}
                   <div style={{ position: 'relative', height: '210px', overflow: 'hidden' }}>
+                    {/* Animated Skeleton Shimmer until image loads */}
+                    {!loadedImages[trip.id] && (
+                      <div className="skeleton-shimmer" style={{ position: 'absolute', inset: 0, zIndex: 1 }} />
+                    )}
                     <img 
                       src={trip.cover_image} 
                       alt={trip.destination} 
-                      style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.4s ease' }}
+                      onLoad={() => setLoadedImages((prev) => ({ ...prev, [trip.id]: true }))}
+                      style={{ 
+                        width: '100%', 
+                        height: '100%', 
+                        objectFit: 'cover', 
+                        transition: 'transform 0.4s ease, opacity 0.3s ease',
+                        opacity: loadedImages[trip.id] ? 1 : 0
+                      }}
                     />
-                    <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.2) 0%, rgba(9, 13, 22, 0.9) 100%)' }} />
+                    <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.2) 0%, rgba(9, 13, 22, 0.9) 100%)', zIndex: 2 }} />
 
                     {/* Badge */}
-                    <div style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'rgba(0, 0, 0, 0.75)', backdropFilter: 'blur(6px)', padding: '0.35rem 0.85rem', borderRadius: '9999px', color: '#00f59b', fontSize: '0.78rem', fontWeight: 800, border: '1px solid rgba(0, 245, 155, 0.35)' }}>
+                    <div style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'rgba(0, 0, 0, 0.75)', backdropFilter: 'blur(6px)', padding: '0.35rem 0.85rem', borderRadius: '9999px', color: '#00f59b', fontSize: '0.78rem', fontWeight: 800, border: '1px solid rgba(0, 245, 155, 0.35)', zIndex: 3 }}>
                       {trip.badge}
                     </div>
 
-                    <div style={{ position: 'absolute', top: '1rem', left: '1rem', background: 'rgba(255, 0, 122, 0.85)', backdropFilter: 'blur(4px)', padding: '0.3rem 0.75rem', borderRadius: '9999px', color: '#ffffff', fontSize: '0.75rem', fontWeight: 800 }}>
+                    <div style={{ position: 'absolute', top: '1rem', left: '1rem', background: 'rgba(255, 0, 122, 0.85)', backdropFilter: 'blur(4px)', padding: '0.3rem 0.75rem', borderRadius: '9999px', color: '#ffffff', fontSize: '0.75rem', fontWeight: 800, zIndex: 3 }}>
                       {trip.category}
                     </div>
 
                     {/* Destination Title on Image */}
-                    <div style={{ position: 'absolute', bottom: '1rem', left: '1.25rem', right: '1.25rem' }}>
+                    <div style={{ position: 'absolute', bottom: '1rem', left: '1.25rem', right: '1.25rem', zIndex: 3 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: '#00f59b', fontSize: '0.82rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                         <MapPin size={13} /> {trip.destination}
                       </div>

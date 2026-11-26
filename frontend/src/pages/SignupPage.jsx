@@ -104,26 +104,26 @@ export default function SignupPage() {
               <div className="ticket-header">
                 <div>
                   <span className="ticket-label">PASSPORT TYPE</span>
-                  <span className="ticket-val" style={{ color: '#00f59b' }}>WanderPlan Global Access</span>
+                  <span className="ticket-val" style={{ color: '#38bdf8' }}>WanderPlan Global Access</span>
                 </div>
                 <div style={{ textAlign: 'right' }}>
                   <span className="ticket-label">MEMBERSHIP</span>
-                  <span className="ticket-val">Lifetime Free</span>
+                  <span className="ticket-val" style={{ color: '#34d399' }}>Lifetime Free</span>
                 </div>
               </div>
 
-              <div style={{ margin: '1rem 0', display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#cbd5e1', fontSize: '0.88rem' }}>
-                  <CheckCircle2 size={16} color="#00f59b" /> Instant custom day-by-day AI schedules
+              <div style={{ margin: '1.15rem 0', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', color: '#cbd5e1', fontSize: '0.88rem' }}>
+                  <CheckCircle2 size={16} color="#34d399" style={{ flexShrink: 0 }} /> Instant custom day-by-day AI schedules
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#cbd5e1', fontSize: '0.88rem' }}>
-                  <CheckCircle2 size={16} color="#00f59b" /> Real-time 8-currency cost conversion
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', color: '#cbd5e1', fontSize: '0.88rem' }}>
+                  <CheckCircle2 size={16} color="#34d399" style={{ flexShrink: 0 }} /> Real-time 8-currency cost conversion
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#cbd5e1', fontSize: '0.88rem' }}>
-                  <CheckCircle2 size={16} color="#00f59b" /> Ask WanderBot AI surrounding area scout
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', color: '#cbd5e1', fontSize: '0.88rem' }}>
+                  <CheckCircle2 size={16} color="#34d399" style={{ flexShrink: 0 }} /> Ask WanderBot AI surrounding area scout
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#cbd5e1', fontSize: '0.88rem' }}>
-                  <CheckCircle2 size={16} color="#00f59b" /> Cloud sync across all your devices
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', color: '#cbd5e1', fontSize: '0.88rem' }}>
+                  <CheckCircle2 size={16} color="#34d399" style={{ flexShrink: 0 }} /> Cloud sync across all your devices
                 </div>
               </div>
 
@@ -134,7 +134,7 @@ export default function SignupPage() {
             </div>
 
             <div className="travel-quote">
-              <Globe2 size={18} color="#00f59b" />
+              <Globe2 size={18} color="#34d399" />
               <span>"The world is a book and those who do not travel read only one page."</span>
             </div>
           </div>

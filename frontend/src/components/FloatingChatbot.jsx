@@ -293,7 +293,7 @@ export default function FloatingChatbot() {
           {/* Footer Input */}
           <div className="chat-input-bar">
             {/* Quick Chips */}
-            <div style={{ display: 'flex', gap: '0.4rem', marginBottom: '0.6rem', overflowX: 'auto', paddingBottom: '0.2rem' }}>
+            <div className="chat-chips-scroll">
               <button onClick={handleUseMyLocation} disabled={locating || loading} className="chat-chip glow-chip-green">
                 {locating ? <Loader2 size={12} className="spinner" /> : <Navigation size={12} />}
                 Use My Location

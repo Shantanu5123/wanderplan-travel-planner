@@ -214,6 +214,8 @@ export default function TripDetailPage({ tripId }) {
     }
   };
 
+  const isExploreSample = Boolean(trip.fromExplore || (typeof trip.id === 'string' && trip.id.startsWith('curated_')));
+
   return (
     <div style={{ width: '100%', minHeight: '100vh', padding: '2.5rem 1rem 6rem 1rem' }}>
       <div style={{ maxWidth: '1040px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
@@ -221,14 +223,14 @@ export default function TripDetailPage({ tripId }) {
         {/* Navigation Breadcrumb / Back Action */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <button 
-            onClick={() => navigate('/dashboard')} 
+            onClick={() => navigate(isExploreSample ? '/explore' : '/dashboard')} 
             className="btn-secondary"
             style={{
               padding: '0.55rem 1.15rem',
               borderRadius: '12px',
             }}
           >
-            <ArrowLeft size={16} color="#60a5fa" /> Back to My Trips
+            <ArrowLeft size={16} color="#60a5fa" /> {isExploreSample ? 'Back to Explore' : 'Back to My Trips'}
           </button>
 
           <span style={{ fontSize: '0.88rem', color: '#cbd5e1', fontWeight: 600 }}>
@@ -292,7 +294,7 @@ export default function TripDetailPage({ tripId }) {
               {copied ? 'Link Copied!' : 'Share Trip'}
             </button>
 
-            {trip.id && trip.id !== 'new' && (
+            {!isExploreSample && trip.id && trip.id !== 'new' && (
               <button 
                 onClick={handleDelete} 
                 disabled={deleteLoading}
