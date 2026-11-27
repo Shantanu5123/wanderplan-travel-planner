@@ -1,6 +1,6 @@
 import json
 import logging
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 from groq import Groq
 from app.config import settings
 from app.schemas.itinerary import ItineraryData, DayPlan, Activity
