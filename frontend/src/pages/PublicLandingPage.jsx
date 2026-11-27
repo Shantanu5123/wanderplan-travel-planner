@@ -40,7 +40,17 @@ import {
   Layers,
   ArrowUpRight,
   Send,
-  Check
+  Check,
+  Plane,
+  Compass as CompassIcon,
+  Coffee,
+  Camera,
+  Activity,
+  Umbrella,
+  CheckSquare,
+  Shield,
+  Zap,
+  Sliders
 } from 'lucide-react';
 
 export default function PublicLandingPage({ onQuickStart }) {
@@ -76,24 +86,6 @@ export default function PublicLandingPage({ onQuickStart }) {
   const heroCard2Y = useTransform(heroProgress, [0, 1], ['0px', '70px']);
   const heroCard3Y = useTransform(heroProgress, [0, 1], ['0px', '-60px']);
   const scrollIndicatorOpacity = useTransform(heroProgress, [0, 0.25], [1, 0]);
-
-  // Sticky Feature Container transforms & auto-cycling when not scrolled
-  const featureContainerRef = useRef(null);
-  const { scrollYProgress: featureProgress } = useScroll({
-    target: featureContainerRef,
-    offset: ['start start', 'end end']
-  });
-
-  // Active step (0, 1, 2, 3) derived from scroll progress or manual click
-  const [activeStep, setActiveStep] = useState(0);
-
-  // Auto-cycle through the feature stages every 4.5 seconds if user is viewing the stage
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setActiveStep((prev) => (prev + 1) % 4);
-    }, 4500);
-    return () => clearInterval(timer);
-  }, []);
 
   // Destination quick input
   const [destinationInput, setDestinationInput] = useState('');
@@ -168,52 +160,12 @@ export default function PublicLandingPage({ onQuickStart }) {
     }
   };
 
-  // Feature steps definition
-  const featureSteps = [
-    {
-      id: '01',
-      title: 'AI Daily Itinerary Architect',
-      subtitle: 'Powered by LLaMA 3.3 70B',
-      desc: 'Smart, balanced daily schedules featuring morning sights, hidden culinary spots, and twilight highlights customized to your travel style and budget.',
-      accent: 'from-blue-500/20 to-cyan-500/10',
-      glowColor: 'rgba(56, 189, 248, 0.25)',
-      badge: 'Step 01 / Generation'
-    },
-    {
-      id: '02',
-      title: 'Interactive Leaflet GPS Routes',
-      subtitle: 'OpenStreetMap & Smart Coordinates',
-      desc: 'Visual split-screen mapping with numbered stops, connected travel polylines, clickable location cards, and instant directions to navigate with confidence.',
-      accent: 'from-emerald-500/20 to-teal-500/10',
-      glowColor: 'rgba(52, 211, 153, 0.25)',
-      badge: 'Step 02 / Navigation'
-    },
-    {
-      id: '03',
-      title: 'Live Weather, Currency & Packing',
-      subtitle: 'Open-Meteo & Intelligent Prep',
-      desc: 'Real-time forecasts, multi-currency live conversions (USD, INR, EUR, JPY, GBP), and dynamic smart packing checklists sorted by clothing, gear, and essentials.',
-      accent: 'from-amber-500/20 to-orange-500/10',
-      glowColor: 'rgba(251, 191, 36, 0.25)',
-      badge: 'Step 03 / Intelligence'
-    },
-    {
-      id: '04',
-      title: 'Ask WanderBot & Social Forking',
-      subtitle: 'Persistent Travel Assistant',
-      desc: 'Your on-demand conversational guide for local etiquette, emergency advice, and hidden gems. Share read-only trip URLs or fork itineraries into your own dashboard.',
-      accent: 'from-purple-500/20 to-pink-500/10',
-      glowColor: 'rgba(192, 132, 252, 0.25)',
-      badge: 'Step 04 / Collaboration'
+  const scrollToExplore = () => {
+    const el = document.getElementById('explore-preview-section');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
     }
-  ];
-
-  const ambientGlowColors = [
-    'radial-gradient(circle at 65% 50%, rgba(56, 189, 248, 0.16) 0%, transparent 60%)',
-    'radial-gradient(circle at 65% 50%, rgba(52, 211, 153, 0.16) 0%, transparent 60%)',
-    'radial-gradient(circle at 65% 50%, rgba(251, 191, 36, 0.14) 0%, transparent 60%)',
-    'radial-gradient(circle at 65% 50%, rgba(192, 132, 252, 0.16) 0%, transparent 60%)'
-  ];
+  };
 
   return (
     <div className="scrolly-landing-root">
@@ -239,7 +191,14 @@ export default function PublicLandingPage({ onQuickStart }) {
               className="scrolly-nav-link"
             >
               <Globe2 size={15} />
-              <span>Explore</span>
+              <span>Explore Library</span>
+            </button>
+            <button 
+              onClick={() => navigate('/plan')} 
+              className="scrolly-nav-link"
+            >
+              <Sparkles size={15} />
+              <span>AI Planner</span>
             </button>
             <button 
               onClick={scrollToAuth} 
@@ -347,7 +306,7 @@ export default function PublicLandingPage({ onQuickStart }) {
           </motion.div>
         </motion.div>
 
-        {/* Floating Parallax Destination Cards */}
+        {/* Floating Parallax Destination Cards with 3D depth */}
         <motion.div 
           className="hero-float-card hero-float-card-1 glass-card"
           style={{ y: heroCard1Y }}
@@ -422,12 +381,11 @@ export default function PublicLandingPage({ onQuickStart }) {
           className="scroll-indicator-wrap"
           style={{ opacity: scrollIndicatorOpacity }}
           onClick={() => {
-            if (featureContainerRef.current) {
-              featureContainerRef.current.scrollIntoView({ behavior: 'smooth' });
-            }
+            const el = document.getElementById('feature-scroll-track');
+            if (el) el.scrollIntoView({ behavior: 'smooth' });
           }}
         >
-          <span className="scroll-indicator-text">Scroll to experience the journey</span>
+          <span className="scroll-indicator-text">Scroll to explore 3D journey</span>
           <motion.div 
             animate={{ y: [0, 8, 0] }}
             transition={{ repeat: Infinity, duration: 1.8, ease: 'easeInOut' }}
@@ -438,410 +396,374 @@ export default function PublicLandingPage({ onQuickStart }) {
         </motion.div>
       </section>
 
-      {/* 3. Section 2: Sticky Scroll-Morphing Feature Stage */}
-      <section ref={featureContainerRef} className="scrolly-feature-container">
-        {/* Dynamic ambient background glow that shifts with activeStep */}
-        <div 
-          className="scrolly-ambient-glow"
-          style={{
-            backgroundImage: ambientGlowColors[activeStep]
-          }}
-        />
-
-        <div className="scrolly-sticky-viewport">
-          <div className="scrolly-stage-grid">
-            
-            {/* Left Column: Active Step Details & Step Tracker */}
-            <div className="scrolly-left-col">
-              <div className="step-counter-track">
-                {featureSteps.map((step, idx) => (
-                  <div 
-                    key={step.id} 
-                    className={`step-track-node ${activeStep === idx ? 'active' : ''} ${activeStep > idx ? 'completed' : ''}`}
-                    onClick={() => setActiveStep(idx)}
-                  >
-                    <div className="node-indicator">
-                      {activeStep > idx ? <Check size={12} /> : step.id}
-                    </div>
-                    <span className="node-label">{step.title.split(' ')[0]}</span>
-                  </div>
-                ))}
-              </div>
-
-              <div className="scrolly-text-content">
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={activeStep}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 20 }}
-                    transition={{ duration: 0.35, ease: 'easeInOut' }}
-                    className="step-text-block"
-                  >
-                    <span className="step-badge-pill">
-                      {featureSteps[activeStep].badge}
-                    </span>
-                    <h2 className="step-main-title">
-                      {featureSteps[activeStep].title}
-                    </h2>
-                    <h4 className="step-sub-title">
-                      {featureSteps[activeStep].subtitle}
-                    </h4>
-                    <p className="step-description">
-                      {featureSteps[activeStep].desc}
-                    </p>
-
-                    <div className="step-cta-row">
-                      <button 
-                        onClick={() => navigate('/plan')}
-                        className="step-primary-btn"
-                      >
-                        <span>Try Feature Now</span>
-                        <ArrowRight size={15} />
-                      </button>
-                      <button 
-                        onClick={scrollToAuth}
-                        className="step-secondary-btn"
-                      >
-                        <span>Sign In</span>
-                      </button>
-                    </div>
-                  </motion.div>
-                </AnimatePresence>
-              </div>
-            </div>
-
-            {/* Right Column: Dynamic Morphing Glassmorphic UI Frame */}
-            <div className="scrolly-right-col">
-              <div className="scrolly-ui-frame glass-card">
-                {/* Browser-like window header */}
-                <div className="ui-frame-header">
-                  <div className="ui-frame-dots">
-                    <span className="dot red"></span>
-                    <span className="dot yellow"></span>
-                    <span className="dot green"></span>
-                  </div>
-                  <div className="ui-frame-title">
-                    <Compass size={13} className="text-cyan-400" />
-                    <span>WanderPlan Interactive Stage</span>
-                  </div>
-                  <div className="ui-frame-badge">
-                    <span className="status-ping"></span> Live Simulation
-                  </div>
-                </div>
-
-                {/* Morphing Window Body */}
-                <div className="ui-frame-body">
-                  <AnimatePresence mode="wait">
-                    {activeStep === 0 && (
-                      <motion.div
-                        key="step-0-itinerary"
-                        initial={{ opacity: 0, scale: 0.96 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.96 }}
-                        transition={{ duration: 0.4 }}
-                        className="stage-mockup-wrapper"
-                      >
-                        <div className="mockup-header-row">
-                          <div>
-                            <span className="text-xs uppercase tracking-wider text-cyan-400 font-bold">Generated Itinerary</span>
-                            <h3 className="text-lg font-bold text-white flex items-center gap-2 mt-0.5">
-                              Kyoto, Japan <span className="text-xs text-slate-400 font-normal">Day 1 of 4</span>
-                            </h3>
-                          </div>
-                          <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-cyan-500/10 text-cyan-300 border border-cyan-500/20">
-                            Balanced Pace
-                          </span>
-                        </div>
-
-                        <div className="mockup-cards-stack">
-                          <motion.div 
-                            initial={{ x: -20, opacity: 0 }}
-                            animate={{ x: 0, opacity: 1 }}
-                            transition={{ delay: 0.1 }}
-                            className="mockup-activity-card"
-                          >
-                            <div className="slot-badge morning">Morning</div>
-                            <div className="card-info">
-                              <div className="font-semibold text-white text-sm">Fushimi Inari Torii Gate Hike</div>
-                              <div className="text-xs text-slate-400 flex items-center gap-2 mt-0.5">
-                                <span>📍 Fushimi Ward</span>
-                                <span>•</span>
-                                <span className="text-emerald-400">Free admission</span>
-                              </div>
-                            </div>
-                            <ArrowUpRight size={14} className="text-slate-500 ml-auto" />
-                          </motion.div>
-
-                          <motion.div 
-                            initial={{ x: -20, opacity: 0 }}
-                            animate={{ x: 0, opacity: 1 }}
-                            transition={{ delay: 0.2 }}
-                            className="mockup-activity-card"
-                          >
-                            <div className="slot-badge afternoon">Afternoon</div>
-                            <div className="card-info">
-                              <div className="font-semibold text-white text-sm">Tofuku-ji Zen Rock Gardens</div>
-                              <div className="text-xs text-slate-400 flex items-center gap-2 mt-0.5">
-                                <span>📍 Higashiyama</span>
-                                <span>•</span>
-                                <span className="text-cyan-400">¥500 ($3.50)</span>
-                              </div>
-                            </div>
-                            <ArrowUpRight size={14} className="text-slate-500 ml-auto" />
-                          </motion.div>
-
-                          <motion.div 
-                            initial={{ x: -20, opacity: 0 }}
-                            animate={{ x: 0, opacity: 1 }}
-                            transition={{ delay: 0.3 }}
-                            className="mockup-activity-card"
-                          >
-                            <div className="slot-badge evening">Evening</div>
-                            <div className="card-info">
-                              <div className="font-semibold text-white text-sm">Gion Lantern Walk & Kaiseki Dinner</div>
-                              <div className="text-xs text-slate-400 flex items-center gap-2 mt-0.5">
-                                <span>📍 Gion District</span>
-                                <span>•</span>
-                                <span className="text-amber-400">Local Cuisine</span>
-                              </div>
-                            </div>
-                            <ArrowUpRight size={14} className="text-slate-500 ml-auto" />
-                          </motion.div>
-                        </div>
-                      </motion.div>
-                    )}
-
-                    {activeStep === 1 && (
-                      <motion.div
-                        key="step-1-map"
-                        initial={{ opacity: 0, scale: 0.96 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.96 }}
-                        transition={{ duration: 0.4 }}
-                        className="stage-mockup-wrapper"
-                      >
-                        <div className="mockup-header-row">
-                          <div>
-                            <span className="text-xs uppercase tracking-wider text-emerald-400 font-bold">Interactive Route</span>
-                            <h3 className="text-lg font-bold text-white flex items-center gap-2 mt-0.5">
-                              Leaflet GPS Polyline <span className="text-xs text-slate-400 font-normal">3 Stops Plotted</span>
-                            </h3>
-                          </div>
-                          <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">
-                            OSM Satellite
-                          </span>
-                        </div>
-
-                        {/* Interactive map mock visualization */}
-                        <div className="mockup-map-viewport">
-                          <div className="map-grid-overlay"></div>
-                          
-                          {/* Animated SVG polyline connecting pins */}
-                          <svg className="map-route-svg" viewBox="0 0 400 240">
-                            <motion.path
-                              d="M 60 180 Q 180 80 340 120"
-                              fill="none"
-                              stroke="#34d399"
-                              strokeWidth="3"
-                              strokeDasharray="6 6"
-                              initial={{ pathLength: 0 }}
-                              animate={{ pathLength: 1 }}
-                              transition={{ duration: 1.2, ease: 'easeInOut' }}
-                            />
-                          </svg>
-
-                          {/* Pin 1 */}
-                          <motion.div 
-                            className="map-pin pin-1"
-                            initial={{ scale: 0 }}
-                            animate={{ scale: 1 }}
-                            transition={{ delay: 0.2 }}
-                          >
-                            <span className="pin-number">1</span>
-                            <div className="pin-popup">Fushimi Inari</div>
-                          </motion.div>
-
-                          {/* Pin 2 */}
-                          <motion.div 
-                            className="map-pin pin-2"
-                            initial={{ scale: 0 }}
-                            animate={{ scale: 1 }}
-                            transition={{ delay: 0.4 }}
-                          >
-                            <span className="pin-number">2</span>
-                            <div className="pin-popup">Tofuku-ji</div>
-                          </motion.div>
-
-                          {/* Pin 3 */}
-                          <motion.div 
-                            className="map-pin pin-3"
-                            initial={{ scale: 0 }}
-                            animate={{ scale: 1 }}
-                            transition={{ delay: 0.6 }}
-                          >
-                            <span className="pin-number">3</span>
-                            <div className="pin-popup">Gion Kaiseki</div>
-                          </motion.div>
-                        </div>
-                      </motion.div>
-                    )}
-
-                    {activeStep === 2 && (
-                      <motion.div
-                        key="step-2-weather-packing"
-                        initial={{ opacity: 0, scale: 0.96 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.96 }}
-                        transition={{ duration: 0.4 }}
-                        className="stage-mockup-wrapper"
-                      >
-                        <div className="mockup-header-row">
-                          <div>
-                            <span className="text-xs uppercase tracking-wider text-amber-400 font-bold">Smart Trip Prep</span>
-                            <h3 className="text-lg font-bold text-white flex items-center gap-2 mt-0.5">
-                              Open-Meteo & Multi-Currency
-                            </h3>
-                          </div>
-                          <div className="flex gap-1.5">
-                            <span className="px-2 py-0.5 rounded text-xs font-semibold bg-amber-500/20 text-amber-300">USD</span>
-                            <span className="px-2 py-0.5 rounded text-xs font-semibold bg-slate-800 text-slate-300">INR</span>
-                            <span className="px-2 py-0.5 rounded text-xs font-semibold bg-slate-800 text-slate-300">EUR</span>
-                          </div>
-                        </div>
-
-                        {/* Weather forecast bar preview */}
-                        <div className="mockup-weather-bar">
-                          <div className="weather-day-box">
-                            <span className="day-name">Thu</span>
-                            <Sun size={18} className="text-amber-400 my-1" />
-                            <span className="temp-range">22° / 14°</span>
-                          </div>
-                          <div className="weather-day-box active">
-                            <span className="day-name">Fri</span>
-                            <CloudSun size={18} className="text-cyan-400 my-1" />
-                            <span className="temp-range">24° / 15°</span>
-                          </div>
-                          <div className="weather-day-box">
-                            <span className="day-name">Sat</span>
-                            <Sun size={18} className="text-amber-400 my-1" />
-                            <span className="temp-range">21° / 13°</span>
-                          </div>
-                          <div className="weather-day-box">
-                            <span className="day-name">Sun</span>
-                            <CloudSun size={18} className="text-cyan-400 my-1" />
-                            <span className="temp-range">19° / 12°</span>
-                          </div>
-                        </div>
-
-                        {/* Dynamic packing checklist mock */}
-                        <div className="mockup-packing-box">
-                          <div className="text-xs font-semibold text-slate-300 mb-2 flex items-center justify-between">
-                            <span>AI Packing Essentials</span>
-                            <span className="text-emerald-400">3/4 Packed</span>
-                          </div>
-                          <div className="packing-items-grid">
-                            <div className="packing-item checked">
-                              <CheckCircle2 size={14} className="text-emerald-400" />
-                              <span>Comfortable walking sneakers</span>
-                            </div>
-                            <div className="packing-item checked">
-                              <CheckCircle2 size={14} className="text-emerald-400" />
-                              <span>Japan Rail Pass & Suica card</span>
-                            </div>
-                            <div className="packing-item checked">
-                              <CheckCircle2 size={14} className="text-emerald-400" />
-                              <span>Type-A power adapter & power bank</span>
-                            </div>
-                            <div className="packing-item">
-                              <div className="w-3.5 h-3.5 rounded-full border border-slate-600"></div>
-                              <span>Lightweight rain jacket</span>
-                            </div>
-                          </div>
-                        </div>
-                      </motion.div>
-                    )}
-
-                    {activeStep === 3 && (
-                      <motion.div
-                        key="step-3-wanderbot"
-                        initial={{ opacity: 0, scale: 0.96 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.96 }}
-                        transition={{ duration: 0.4 }}
-                        className="stage-mockup-wrapper"
-                      >
-                        <div className="mockup-header-row">
-                          <div>
-                            <span className="text-xs uppercase tracking-wider text-purple-400 font-bold">Instant Companion</span>
-                            <h3 className="text-lg font-bold text-white flex items-center gap-2 mt-0.5">
-                              Ask WanderBot AI
-                            </h3>
-                          </div>
-                          <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-purple-500/10 text-purple-300 border border-purple-500/20 flex items-center gap-1.5">
-                            <Bot size={12} /> Online 24/7
-                          </span>
-                        </div>
-
-                        {/* WanderBot Chat preview */}
-                        <div className="mockup-chat-feed">
-                          <div className="chat-bubble user">
-                            <p className="text-xs">What is the best way to get to Arashiyama bamboo grove early?</p>
-                          </div>
-                          <div className="chat-bubble bot">
-                            <div className="bot-avatar-mini">
-                              <Bot size={12} />
-                            </div>
-                            <p className="text-xs leading-relaxed text-slate-200">
-                              Take the JR San-in line from Kyoto Station to Saga-Arashiyama (15 mins). Arrive before 8:00 AM to enjoy tranquil photography without tour crowds!
-                            </p>
-                          </div>
-                        </div>
-
-                        <div className="mockup-chat-input-bar">
-                          <input 
-                            type="text" 
-                            disabled 
-                            placeholder="Ask about local trains, currency, or hidden ramen shops..." 
-                            className="chat-mock-input" 
-                          />
-                          <button className="chat-mock-send">
-                            <Send size={13} />
-                          </button>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              </div>
-            </div>
-
-          </div>
+      {/* 3. Section 2: 3D Scrollytelling Feature Walkthrough */}
+      <section id="feature-scroll-track" className="scrolly-3d-section">
+        <div className="section-title-wrap text-center">
+          <span className="section-pill">Interactive 3D Stage</span>
+          <h2 className="section-headline">Everything You Need To Wander Smarter</h2>
+          <p className="section-subtitle">
+            Explore the four pillars powering WanderPlan's next-generation travel engine.
+          </p>
         </div>
 
-        {/* Mobile Fallback: Vertical Animated Cards (< 768px) */}
-        <div className="scrolly-mobile-cards">
-          {featureSteps.map((step, idx) => (
-            <motion.div
-              key={step.id}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-50px' }}
-              transition={{ duration: 0.6 }}
-              className="mobile-feature-card glass-card"
-            >
-              <div className="mobile-step-header">
-                <span className="mobile-step-num">{step.id}</span>
-                <span className="mobile-step-badge">{step.badge}</span>
+        {/* FEATURE 1: AI ITINERARY BUILDER (3D CARD) */}
+        <motion.div 
+          className="feature-3d-row"
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: 0.7 }}
+        >
+          <div className="feature-3d-text">
+            <div className="step-tag-pill blue">
+              <Sparkles size={14} /> Step 01 / Generation
+            </div>
+            <h3 className="feature-3d-title">AI Daily Itinerary Architect</h3>
+            <span className="feature-3d-highlight text-cyan-400">Powered by LLaMA 3.3 70B</span>
+            <p className="feature-3d-desc">
+              Generate perfectly balanced morning, afternoon, and evening schedules with optimal routing, real ticket cost estimates, local cuisine recommendations, and walking times.
+            </p>
+            <div className="feature-badges-list">
+              <span className="f-badge">✨ Pace Optimization</span>
+              <span className="f-badge">🥗 Dietary Customization</span>
+              <span className="f-badge">♿ Mobility Support</span>
+            </div>
+            <button onClick={() => navigate('/plan')} className="feature-action-btn blue-btn">
+              <span>Launch Itinerary Architect</span>
+              <ArrowRight size={15} />
+            </button>
+          </div>
+
+          <div className="feature-3d-visual">
+            <div className="card-3d-glass card-tilt-right">
+              <div className="visual-window-header">
+                <span className="dot red"></span>
+                <span className="dot yellow"></span>
+                <span className="dot green"></span>
+                <span className="visual-title">Kyoto, Japan • Day 1 Itinerary</span>
               </div>
-              <h3 className="mobile-step-title">{step.title}</h3>
-              <p className="mobile-step-desc">{step.desc}</p>
+              <div className="mockup-cards-stack">
+                <div className="mockup-activity-card">
+                  <div className="slot-badge morning">Morning</div>
+                  <div className="card-info">
+                    <div className="font-semibold text-white text-sm">Fushimi Inari Torii Gate Hike</div>
+                    <div className="text-xs text-slate-400 flex items-center gap-2 mt-0.5">
+                      <span>📍 Fushimi Ward</span> • <span className="text-emerald-400">Free admission</span>
+                    </div>
+                  </div>
+                  <ArrowUpRight size={14} className="text-slate-500 ml-auto" />
+                </div>
+                <div className="mockup-activity-card">
+                  <div className="slot-badge afternoon">Afternoon</div>
+                  <div className="card-info">
+                    <div className="font-semibold text-white text-sm">Tofuku-ji Zen Rock Gardens</div>
+                    <div className="text-xs text-slate-400 flex items-center gap-2 mt-0.5">
+                      <span>📍 Higashiyama</span> • <span className="text-cyan-400">¥500 ($3.50)</span>
+                    </div>
+                  </div>
+                  <ArrowUpRight size={14} className="text-slate-500 ml-auto" />
+                </div>
+                <div className="mockup-activity-card">
+                  <div className="slot-badge evening">Evening</div>
+                  <div className="card-info">
+                    <div className="font-semibold text-white text-sm">Gion Lantern Walk & Kaiseki</div>
+                    <div className="text-xs text-slate-400 flex items-center gap-2 mt-0.5">
+                      <span>📍 Gion District</span> • <span className="text-amber-400">Local Cuisine</span>
+                    </div>
+                  </div>
+                  <ArrowUpRight size={14} className="text-slate-500 ml-auto" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* FEATURE 2: INTERACTIVE LEAFLET GPS MAP (3D CARD) */}
+        <motion.div 
+          className="feature-3d-row reverse"
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: 0.7 }}
+        >
+          <div className="feature-3d-text">
+            <div className="step-tag-pill green">
+              <Navigation size={14} /> Step 02 / Navigation
+            </div>
+            <h3 className="feature-3d-title">Interactive Leaflet GPS Routes</h3>
+            <span className="feature-3d-highlight text-emerald-400">OpenStreetMap & Live Polylines</span>
+            <p className="feature-3d-desc">
+              Experience responsive split-screen mapping with numbered stop markers, dashed travel routes, and interactive hover-fly zooms that take you directly to your destinations.
+            </p>
+            <div className="feature-badges-list">
+              <span className="f-badge">🗺️ Real-world Coordinates</span>
+              <span className="f-badge">📍 1-Click "Open in Maps"</span>
+              <span className="f-badge">🧭 Sequence Routes</span>
+            </div>
+            <button onClick={() => navigate('/explore')} className="feature-action-btn green-btn">
+              <span>Preview Map View</span>
+              <ArrowRight size={15} />
+            </button>
+          </div>
+
+          <div className="feature-3d-visual">
+            <div className="card-3d-glass card-tilt-left">
+              <div className="visual-window-header">
+                <span className="dot red"></span>
+                <span className="dot yellow"></span>
+                <span className="dot green"></span>
+                <span className="visual-title">Live GPS Waypoints Route</span>
+              </div>
+              <div className="mockup-map-viewport">
+                <div className="map-grid-overlay"></div>
+                <svg className="map-route-svg" viewBox="0 0 400 240">
+                  <motion.path
+                    d="M 60 180 Q 180 80 340 120"
+                    fill="none"
+                    stroke="#34d399"
+                    strokeWidth="3.5"
+                    strokeDasharray="6 6"
+                    initial={{ pathLength: 0 }}
+                    whileInView={{ pathLength: 1 }}
+                    transition={{ duration: 1.4, ease: 'easeInOut' }}
+                  />
+                </svg>
+                <div className="map-pin pin-1">
+                  <span className="pin-number">1</span>
+                  <div className="pin-popup">Fushimi Inari</div>
+                </div>
+                <div className="map-pin pin-2">
+                  <span className="pin-number">2</span>
+                  <div className="pin-popup">Tofuku-ji</div>
+                </div>
+                <div className="map-pin pin-3">
+                  <span className="pin-number">3</span>
+                  <div className="pin-popup">Gion Kaiseki</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* FEATURE 3: LIVE WEATHER & PACKING LIST (3D CARD) */}
+        <motion.div 
+          className="feature-3d-row"
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: 0.7 }}
+        >
+          <div className="feature-3d-text">
+            <div className="step-tag-pill amber">
+              <Sun size={14} /> Step 03 / Intelligence
+            </div>
+            <h3 className="feature-3d-title">Live Weather & Smart Packing</h3>
+            <span className="feature-3d-highlight text-amber-400">Open-Meteo & Multi-Currency</span>
+            <p className="feature-3d-desc">
+              Accurate 4-day weather forecasts tied to your travel window, dynamic multi-currency converter (USD, INR, EUR, JPY, GBP), and automated interactive packing checklists.
+            </p>
+            <div className="feature-badges-list">
+              <span className="f-badge">☀️ 4-Day Forecasts</span>
+              <span className="f-badge">🧳 Categorized Gear</span>
+              <span className="f-badge">💱 8 Currency Conversions</span>
+            </div>
+            <button onClick={() => navigate('/plan')} className="feature-action-btn amber-btn">
+              <span>Start Prepared Trip</span>
+              <ArrowRight size={15} />
+            </button>
+          </div>
+
+          <div className="feature-3d-visual">
+            <div className="card-3d-glass card-tilt-right">
+              <div className="visual-window-header">
+                <span className="dot red"></span>
+                <span className="dot yellow"></span>
+                <span className="dot green"></span>
+                <span className="visual-title">Open-Meteo Forecast & Checklist</span>
+              </div>
+              <div className="p-4 flex flex-col gap-3">
+                <div className="mockup-weather-bar">
+                  <div className="weather-day-box">
+                    <span className="day-name">Thu</span>
+                    <Sun size={18} className="text-amber-400 my-1" />
+                    <span className="temp-range">22° / 14°</span>
+                  </div>
+                  <div className="weather-day-box active">
+                    <span className="day-name">Fri</span>
+                    <CloudSun size={18} className="text-cyan-400 my-1" />
+                    <span className="temp-range">24° / 15°</span>
+                  </div>
+                  <div className="weather-day-box">
+                    <span className="day-name">Sat</span>
+                    <Sun size={18} className="text-amber-400 my-1" />
+                    <span className="temp-range">21° / 13°</span>
+                  </div>
+                  <div className="weather-day-box">
+                    <span className="day-name">Sun</span>
+                    <CloudSun size={18} className="text-cyan-400 my-1" />
+                    <span className="temp-range">19° / 12°</span>
+                  </div>
+                </div>
+
+                <div className="mockup-packing-box">
+                  <div className="text-xs font-semibold text-slate-300 mb-2 flex items-center justify-between">
+                    <span>AI Packing Essentials</span>
+                    <span className="text-emerald-400">3/4 Packed</span>
+                  </div>
+                  <div className="packing-items-grid">
+                    <div className="packing-item checked">
+                      <CheckCircle2 size={14} className="text-emerald-400" />
+                      <span>Comfortable walking sneakers</span>
+                    </div>
+                    <div className="packing-item checked">
+                      <CheckCircle2 size={14} className="text-emerald-400" />
+                      <span>Type-A adapter & power bank</span>
+                    </div>
+                    <div className="packing-item">
+                      <div className="w-3.5 h-3.5 rounded-full border border-slate-600"></div>
+                      <span>Lightweight rain jacket</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* FEATURE 4: ASK WANDERBOT COMPANION (3D CARD) */}
+        <motion.div 
+          className="feature-3d-row reverse"
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: 0.7 }}
+        >
+          <div className="feature-3d-text">
+            <div className="step-tag-pill purple">
+              <Bot size={14} /> Step 04 / Collaboration
+            </div>
+            <h3 className="feature-3d-title">Ask WanderBot & Social Sharing</h3>
+            <span className="feature-3d-highlight text-purple-400">Your 24/7 AI Travel Assistant</span>
+            <p className="feature-3d-desc">
+              Get immediate answers for local tipping customs, metro transit directions, and hidden neighborhood gems. Share read-only trip URLs or fork itineraries into your own dashboard in one click.
+            </p>
+            <div className="feature-badges-list">
+              <span className="f-badge">💬 24/7 Conversational Help</span>
+              <span className="f-badge">🔗 Read-only Public Links</span>
+              <span className="f-badge">📑 Duplicate & Fork Trips</span>
+            </div>
+            <button onClick={() => navigate('/explore')} className="feature-action-btn purple-btn">
+              <span>Explore Master Trips</span>
+              <ArrowRight size={15} />
+            </button>
+          </div>
+
+          <div className="feature-3d-visual">
+            <div className="card-3d-glass card-tilt-left">
+              <div className="visual-window-header">
+                <span className="dot red"></span>
+                <span className="dot yellow"></span>
+                <span className="dot green"></span>
+                <span className="visual-title">WanderBot Live Assistant</span>
+              </div>
+              <div className="p-4 flex flex-col gap-3">
+                <div className="mockup-chat-feed">
+                  <div className="chat-bubble user">
+                    <p className="text-xs">How do I reach Arashiyama bamboo grove early?</p>
+                  </div>
+                  <div className="chat-bubble bot">
+                    <div className="bot-avatar-mini">
+                      <Bot size={12} />
+                    </div>
+                    <p className="text-xs leading-relaxed text-slate-200">
+                      Take the JR San-in line from Kyoto Station to Saga-Arashiyama (15 mins). Arrive before 8:00 AM for tranquil photography without tour crowds!
+                    </p>
+                  </div>
+                </div>
+                <div className="mockup-chat-input-bar">
+                  <input 
+                    type="text" 
+                    disabled 
+                    placeholder="Ask about trains, local etiquette, or hidden food..." 
+                    className="chat-mock-input" 
+                  />
+                  <button className="chat-mock-send">
+                    <Send size={13} />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      </section>
+
+      {/* 4. Section 3: Curated Master Itineraries Preview */}
+      <section id="explore-preview-section" className="landing-explore-preview-section">
+        <div className="explore-header-row">
+          <div>
+            <span className="section-pill">Handcrafted Journeys</span>
+            <h2 className="text-3xl font-extrabold text-white">Popular Master Itineraries</h2>
+            <p className="text-slate-400 text-sm mt-1">
+              Preview real-world itineraries created by local explorers and AI.
+            </p>
+          </div>
+          <button onClick={() => navigate('/explore')} className="view-all-dest-btn">
+            <span>View All Destinations</span>
+            <ArrowRight size={15} />
+          </button>
+        </div>
+
+        <div className="landing-trips-grid">
+          {CURATED_ITINERARIES.slice(0, 3).map((trip) => (
+            <motion.div 
+              key={trip.id}
+              whileHover={{ y: -8, scale: 1.02 }}
+              transition={{ duration: 0.25 }}
+              className="landing-trip-card glass-card"
+              onClick={() => {
+                sessionStorage.setItem('viewing_trip', JSON.stringify({
+                  id: trip.id,
+                  fromExplore: true,
+                  destination: trip.destination,
+                  start_date: new Date().toISOString().split('T')[0],
+                  end_date: new Date(Date.now() + (trip.days.length - 1) * 86400000).toISOString().split('T')[0],
+                  budget: trip.budget,
+                  travel_style: trip.travel_style,
+                  interests: trip.interests,
+                  itinerary_data: {
+                    destination: trip.destination,
+                    summary: trip.summary,
+                    estimated_total_cost: trip.estimated_total_cost,
+                    days: trip.days,
+                  }
+                }));
+                navigate('/trip/new');
+              }}
+            >
+              <div className="landing-trip-img-wrap">
+                <img src={trip.cover_image} alt={trip.destination} className="landing-trip-img" />
+                <span className="landing-badge-cat">{trip.category}</span>
+                <span className="landing-badge-duration"><Clock size={11} /> {trip.duration}</span>
+              </div>
+              <div className="landing-trip-content">
+                <div className="flex items-center gap-1.5 text-xs text-cyan-400 font-semibold mb-1">
+                  <MapPin size={12} /> {trip.destination}
+                </div>
+                <h4 className="landing-trip-title">{trip.title}</h4>
+                <p className="landing-trip-summary">{trip.summary.slice(0, 110)}...</p>
+                <div className="landing-trip-footer">
+                  <span className="landing-trip-cost">{trip.estimated_total_cost}</span>
+                  <span className="landing-trip-preview-link">
+                    View Plan <ArrowUpRight size={13} />
+                  </span>
+                </div>
+              </div>
             </motion.div>
           ))}
         </div>
       </section>
 
-      {/* 4. Section 3: Final Reveal — Glassmorphic Auth & Guest Access (`#auth-section`) */}
+      {/* 5. Section 4: Final Reveal — Glassmorphic Auth & Guest Access (`#auth-section`) */}
       <section id="auth-section" className="scrolly-auth-section">
         <motion.div 
           className="auth-reveal-card glass-card"
