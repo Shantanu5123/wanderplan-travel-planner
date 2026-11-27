@@ -129,14 +129,14 @@ export default function PublicLandingPage({ onQuickStart }) {
 
           <div className="scrolly-nav-actions">
             <button 
-              onClick={() => navigate('/explore')} 
+              onClick={() => navigate('/login')} 
               className="scrolly-nav-link"
             >
               <Globe2 size={15} />
               <span>Explore Library</span>
             </button>
             <button 
-              onClick={() => navigate('/plan')} 
+              onClick={() => navigate('/login')} 
               className="scrolly-nav-link"
             >
               <Sparkles size={15} />
@@ -370,7 +370,7 @@ export default function PublicLandingPage({ onQuickStart }) {
               <span className="f-badge">🥗 Dietary Customization</span>
               <span className="f-badge">♿ Mobility Support</span>
             </div>
-            <button onClick={() => navigate('/plan')} className="feature-action-btn blue-btn">
+            <button onClick={() => navigate('/login')} className="feature-action-btn blue-btn">
               <span>Launch Itinerary Architect</span>
               <ArrowRight size={15} />
             </button>
@@ -442,7 +442,7 @@ export default function PublicLandingPage({ onQuickStart }) {
               <span className="f-badge">📍 1-Click "Open in Maps"</span>
               <span className="f-badge">🧭 Sequence Routes</span>
             </div>
-            <button onClick={() => navigate('/explore')} className="feature-action-btn green-btn">
+            <button onClick={() => navigate('/login')} className="feature-action-btn green-btn">
               <span>Preview Map View</span>
               <ArrowRight size={15} />
             </button>
@@ -509,7 +509,7 @@ export default function PublicLandingPage({ onQuickStart }) {
               <span className="f-badge">🧳 Categorized Gear</span>
               <span className="f-badge">💱 8 Currency Conversions</span>
             </div>
-            <button onClick={() => navigate('/plan')} className="feature-action-btn amber-btn">
+            <button onClick={() => navigate('/login')} className="feature-action-btn amber-btn">
               <span>Start Prepared Trip</span>
               <ArrowRight size={15} />
             </button>
@@ -594,7 +594,7 @@ export default function PublicLandingPage({ onQuickStart }) {
               <span className="f-badge">🔗 Read-only Public Links</span>
               <span className="f-badge">📑 Duplicate & Fork Trips</span>
             </div>
-            <button onClick={() => navigate('/explore')} className="feature-action-btn purple-btn">
+            <button onClick={() => navigate('/login')} className="feature-action-btn purple-btn">
               <span>Explore Master Trips</span>
               <ArrowRight size={15} />
             </button>
@@ -644,12 +644,12 @@ export default function PublicLandingPage({ onQuickStart }) {
         <div className="explore-header-row">
           <div>
             <span className="section-pill">Handcrafted Journeys</span>
-            <h2 className="text-3xl font-extrabold text-white">Popular Master Itineraries</h2>
-            <p className="text-slate-400 text-sm mt-1">
-              Preview real-world itineraries created by local explorers and AI.
+            <h2 className="text-3xl md:text-4xl font-extrabold text-white mt-1">Popular Master Itineraries</h2>
+            <p className="text-slate-400 text-sm mt-1.5">
+              Preview real-world, hand-curated itineraries designed by local explorers and AI.
             </p>
           </div>
-          <button onClick={() => navigate('/explore')} className="view-all-dest-btn">
+          <button onClick={() => navigate('/login')} className="view-all-dest-btn">
             <span>View All Destinations</span>
             <ArrowRight size={15} />
           </button>
@@ -659,44 +659,40 @@ export default function PublicLandingPage({ onQuickStart }) {
           {CURATED_ITINERARIES.slice(0, 3).map((trip) => (
             <motion.div 
               key={trip.id}
-              whileHover={{ y: -8, scale: 1.02 }}
+              whileHover={{ y: -6, scale: 1.015 }}
               transition={{ duration: 0.25 }}
               className="landing-trip-card glass-card"
               onClick={() => {
-                sessionStorage.setItem('viewing_trip', JSON.stringify({
-                  id: trip.id,
-                  fromExplore: true,
+                sessionStorage.setItem('prefill_planner', JSON.stringify({
                   destination: trip.destination,
-                  start_date: new Date().toISOString().split('T')[0],
-                  end_date: new Date(Date.now() + (trip.days.length - 1) * 86400000).toISOString().split('T')[0],
-                  budget: trip.budget,
-                  travel_style: trip.travel_style,
-                  interests: trip.interests,
-                  itinerary_data: {
-                    destination: trip.destination,
-                    summary: trip.summary,
-                    estimated_total_cost: trip.estimated_total_cost,
-                    days: trip.days,
-                  }
+                  budget: trip.budget || 'moderate',
+                  travelStyle: trip.travel_style || 'balanced',
+                  interests: trip.interests || ['Food & Dining', 'Culture']
                 }));
-                navigate('/trip/new');
+                navigate('/login');
               }}
+              style={{ cursor: 'pointer' }}
             >
               <div className="landing-trip-img-wrap">
                 <img src={trip.cover_image} alt={trip.destination} className="landing-trip-img" />
+                <div className="landing-trip-img-gradient" />
                 <span className="landing-badge-cat">{trip.category}</span>
-                <span className="landing-badge-duration"><Clock size={11} /> {trip.duration}</span>
+                <span className="landing-badge-duration"><Clock size={12} /> {trip.duration}</span>
               </div>
               <div className="landing-trip-content">
-                <div className="flex items-center gap-1.5 text-xs text-cyan-400 font-semibold mb-1">
-                  <MapPin size={12} /> {trip.destination}
+                <div className="landing-dest-tag">
+                  <MapPin size={13} className="text-cyan-400 shrink-0" />
+                  <span>{trip.destination}</span>
                 </div>
                 <h4 className="landing-trip-title">{trip.title}</h4>
-                <p className="landing-trip-summary">{trip.summary.slice(0, 110)}...</p>
+                <p className="landing-trip-summary">{trip.summary}</p>
                 <div className="landing-trip-footer">
-                  <span className="landing-trip-cost">{trip.estimated_total_cost}</span>
+                  <div className="landing-trip-cost-col">
+                    <span className="cost-label">Est. Total</span>
+                    <span className="landing-trip-cost">{trip.estimated_total_cost}</span>
+                  </div>
                   <span className="landing-trip-preview-link">
-                    View Plan <ArrowUpRight size={13} />
+                    <span>Unlock Plan</span> <ArrowRight size={14} />
                   </span>
                 </div>
               </div>
