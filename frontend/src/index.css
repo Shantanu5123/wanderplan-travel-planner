@@ -3088,11 +3088,11 @@ body {
 /* SECTION 2: STICKY SCROLL-MORPHING FEATURE STAGE */
 .scrolly-feature-container {
   position: relative;
-  min-height: 320vh; /* Generous scroll track for smooth transitions */
+  min-height: 200vh; /* Smooth, tight scroll track without excessive dead space */
 }
 
 .scrolly-ambient-glow {
-  position: fixed;
+  position: absolute;
   inset: 0;
   pointer-events: none;
   z-index: 0;
@@ -3681,11 +3681,11 @@ body {
 /* SECTION 3: FINAL REVEAL (AUTH & GUEST ACCESS) */
 .scrolly-auth-section {
   position: relative;
-  min-height: 100vh;
+  min-height: auto;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 5rem 1.5rem;
+  padding: 4rem 1.5rem 5rem 1.5rem;
   z-index: 10;
 }
 
