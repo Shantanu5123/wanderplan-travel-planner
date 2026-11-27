@@ -718,12 +718,12 @@ export default function PublicLandingPage({ onQuickStart }) {
           viewport={{ once: true, margin: '-60px' }}
           transition={{ duration: 0.6, ease: 'easeOut' }}
         >
-          <div className="auth-card-header text-center">
-            <div className="auth-logo-badge pulse-badge">
+          <div className="auth-card-header text-center" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.75rem' }}>
+            <div className="pulse-badge">
               <Compass size={28} className="text-cyan-400" />
             </div>
-            <span className="section-pill mt-3 mb-2">Ready For Your Next Journey?</span>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-white mt-1 mb-3">
+            <span className="section-pill">Ready For Your Next Journey?</span>
+            <h2 className="text-3xl md:text-4xl font-extrabold text-white mt-1 mb-2">
               Start Designing Your Custom Itinerary Now
             </h2>
             <p className="text-slate-300 text-base max-w-lg mx-auto leading-relaxed">

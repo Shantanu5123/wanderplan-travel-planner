@@ -9,6 +9,7 @@ export function HashRouter({ children }) {
   useEffect(() => {
     const handleHashChange = () => {
       setCurrentPath(getPath());
+      window.scrollTo(0, 0);
     };
     window.addEventListener('hashchange', handleHashChange);
     return () => window.removeEventListener('hashchange', handleHashChange);
