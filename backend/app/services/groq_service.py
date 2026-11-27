@@ -12,7 +12,11 @@ logger = logging.getLogger(__name__)
 class GroqItineraryService:
     def __init__(self):
         self.api_key = settings.GROQ_API_KEY
-        self.model = settings.GROQ_MODEL
+        # If GROQ_MODEL in env is an unavailable/legacy model like llama-3.3-70b-versatile, fallback to active model
+        env_model = settings.GROQ_MODEL
+        if not env_model or "llama-3.3" in env_model:
+            env_model = "openai/gpt-oss-120b"
+        self.model = env_model
         self._client = None
 
     @property
