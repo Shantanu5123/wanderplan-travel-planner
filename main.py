@@ -9,6 +9,8 @@ if backend_dir not in sys.path:
 
 from app.main import app
 
+handler = app
+
 if __name__ == "__main__":
     import uvicorn
     port = int(os.environ.get("PORT", 8000))

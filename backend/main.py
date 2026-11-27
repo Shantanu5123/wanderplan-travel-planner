@@ -1,37 +1,15 @@
-# FastAPI ASGI application entrypoint with safe diagnostic fallback
+# FastAPI ASGI application entrypoint
 import os
 import sys
-import traceback
-import logging
 
+# Ensure current directory is in sys.path
 backend_dir = os.path.dirname(os.path.abspath(__file__))
 if backend_dir not in sys.path:
     sys.path.insert(0, backend_dir)
 
-try:
-    from app.main import app
-except Exception as e:
-    err_type = type(e).__name__
-    err_str = str(e)
-    tb_str = traceback.format_exc()
-    from fastapi import FastAPI
-    from fastapi.responses import JSONResponse
+from app.main import app
 
-    app = FastAPI(title="WanderPlan Diagnostic Fallback")
-
-    @app.api_route("/{rest_of_path:path}", methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "PATCH"])
-    async def debug_catcher(rest_of_path: str):
-        return JSONResponse(
-            status_code=500,
-            content={
-                "error": "Backend failed to load on Vercel",
-                "exception_type": err_type,
-                "exception_message": err_str,
-                "traceback": tb_str,
-                "cwd": os.getcwd(),
-                "sys_path": sys.path
-            }
-        )
+handler = app
 
 if __name__ == "__main__":
     import uvicorn
