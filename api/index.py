@@ -1,28 +1,21 @@
-import os
-import sys
-import traceback
+from http.server import BaseHTTPRequestHandler
+import json
 
-current_dir = os.path.dirname(os.path.abspath(__file__))
-root_dir = os.path.dirname(current_dir)
-backend_dir = os.path.join(root_dir, "backend")
+class handler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.send_header('Content-type', 'application/json')
+        self.end_headers()
+        response = {"status": "ok", "message": "Raw handler works"}
+        self.wfile.write(json.dumps(response).encode('utf-8'))
+        return
 
-for d in [root_dir, backend_dir]:
-    if d not in sys.path:
-        sys.path.insert(0, d)
+    def do_POST(self):
+        self.send_response(200)
+        self.send_header('Content-type', 'application/json')
+        self.end_headers()
+        response = {"status": "ok", "message": "Raw handler POST works"}
+        self.wfile.write(json.dumps(response).encode('utf-8'))
+        return
 
-try:
-    from app.main import app
-except Exception as e:
-    tb = traceback.format_exc()
-    from fastapi import FastAPI
-    from fastapi.responses import JSONResponse
-
-    app = FastAPI()
-
-    @app.api_route("/{path_name:path}", methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"])
-    async def catch_all(path_name: str):
-        return JSONResponse(
-            status_code=500,
-            content={"error": str(e), "traceback": tb}
-        )
 
