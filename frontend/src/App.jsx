@@ -64,7 +64,7 @@ function RouterOutlet() {
 
   // Public Landing Page at root `/`
   if (currentPath === '/') {
-    return <PublicLandingPage onQuickStart={() => navigate('/plan')} />;
+    return <PublicLandingPage onQuickStart={() => navigate('/login')} />;
   }
 
   // Planner page (accessible publicly or when logged in)

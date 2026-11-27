@@ -101,11 +101,7 @@ export default function PublicLandingPage({ onQuickStart }) {
         interests: ['Food & Dining', 'History & Culture', 'Local Hidden Gems']
       }));
     }
-    if (onQuickStart) {
-      onQuickStart();
-    } else {
-      navigate('/plan');
-    }
+    navigate('/login');
   };
 
   const handleGuestLogin = () => {
@@ -734,7 +730,7 @@ export default function PublicLandingPage({ onQuickStart }) {
           {/* Quick Action Matrix */}
           <div className="cta-action-matrix">
             <button
-              onClick={() => navigate('/plan')}
+              onClick={() => navigate('/login')}
               className="cta-primary-button"
             >
               <Sparkles size={18} />
