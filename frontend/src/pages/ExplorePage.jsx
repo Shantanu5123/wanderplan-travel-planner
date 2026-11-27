@@ -23,7 +23,8 @@ import {
   Clock,
   Send,
   Loader2,
-  ChevronRight
+  ChevronRight,
+  Heart
 } from 'lucide-react';
 
 export const CURATED_ITINERARIES = [

@@ -77,29 +77,23 @@ export default function PublicLandingPage({ onQuickStart }) {
   const heroCard3Y = useTransform(heroProgress, [0, 1], ['0px', '-60px']);
   const scrollIndicatorOpacity = useTransform(heroProgress, [0, 0.25], [1, 0]);
 
-  // Sticky Feature Container transforms
+  // Sticky Feature Container transforms & auto-cycling when not scrolled
   const featureContainerRef = useRef(null);
   const { scrollYProgress: featureProgress } = useScroll({
     target: featureContainerRef,
     offset: ['start start', 'end end']
   });
 
-  // Active step (0, 1, 2, 3) derived from scroll progress
+  // Active step (0, 1, 2, 3) derived from scroll progress or manual click
   const [activeStep, setActiveStep] = useState(0);
 
+  // Auto-cycle through the feature stages every 4.5 seconds if user is viewing the stage
   useEffect(() => {
-    return featureProgress.on('change', (latest) => {
-      if (latest < 0.25) {
-        setActiveStep(0);
-      } else if (latest < 0.50) {
-        setActiveStep(1);
-      } else if (latest < 0.75) {
-        setActiveStep(2);
-      } else {
-        setActiveStep(3);
-      }
-    });
-  }, [featureProgress]);
+    const timer = setInterval(() => {
+      setActiveStep((prev) => (prev + 1) % 4);
+    }, 4500);
+    return () => clearInterval(timer);
+  }, []);
 
   // Destination quick input
   const [destinationInput, setDestinationInput] = useState('');
@@ -464,12 +458,7 @@ export default function PublicLandingPage({ onQuickStart }) {
                   <div 
                     key={step.id} 
                     className={`step-track-node ${activeStep === idx ? 'active' : ''} ${activeStep > idx ? 'completed' : ''}`}
-                    onClick={() => {
-                      if (featureContainerRef.current) {
-                        const targetScroll = featureContainerRef.current.offsetTop + (idx / 4) * featureContainerRef.current.offsetHeight;
-                        window.scrollTo({ top: targetScroll, behavior: 'smooth' });
-                      }
-                    }}
+                    onClick={() => setActiveStep(idx)}
                   >
                     <div className="node-indicator">
                       {activeStep > idx ? <Check size={12} /> : step.id}

@@ -3085,10 +3085,12 @@ body {
   color: #38bdf8;
 }
 
-/* SECTION 2: STICKY SCROLL-MORPHING FEATURE STAGE */
+/* SECTION 2: FEATURE SHOWCASE STAGE */
 .scrolly-feature-container {
   position: relative;
-  min-height: 200vh; /* Smooth, tight scroll track without excessive dead space */
+  padding: 3rem 1.5rem 5rem 1.5rem;
+  max-width: 1240px;
+  margin: 0 auto;
 }
 
 .scrolly-ambient-glow {
@@ -3100,18 +3102,15 @@ body {
 }
 
 .scrolly-sticky-viewport {
-  position: sticky;
-  top: 0;
-  height: 100vh;
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 5rem 1.5rem 3rem 1.5rem;
+  padding: 1rem 0;
   z-index: 10;
 }
 
 .scrolly-stage-grid {
-  max-width: 1200px;
   width: 100%;
   display: grid;
   grid-template-columns: 1fr 1.15fr;
@@ -3123,14 +3122,6 @@ body {
   .scrolly-stage-grid {
     grid-template-columns: 1fr;
     gap: 2rem;
-  }
-  .scrolly-feature-container {
-    min-height: auto;
-  }
-  .scrolly-sticky-viewport {
-    position: relative;
-    height: auto;
-    display: none;
   }
 }
 
@@ -3623,19 +3614,21 @@ body {
   justify-content: center;
 }
 
-/* Mobile cards (< 960px) */
+/* Mobile cards (< 768px) */
 .scrolly-mobile-cards {
   display: none;
-  padding: 2rem 1.5rem 4rem 1.5rem;
-  flex-direction: column;
-  gap: 1.5rem;
-  max-width: 600px;
-  margin: 0 auto;
 }
 
-@media (max-width: 960px) {
+@media (max-width: 768px) {
+  .scrolly-sticky-viewport {
+    display: none;
+  }
   .scrolly-mobile-cards {
     display: flex;
+    padding: 1.5rem 0 3rem 0;
+    flex-direction: column;
+    gap: 1.5rem;
+    width: 100%;
   }
 }
 
