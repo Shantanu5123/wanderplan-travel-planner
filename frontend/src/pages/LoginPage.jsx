@@ -13,12 +13,16 @@ import {
   MapPin, 
   Sparkles, 
   ArrowRight,
-  Globe2,
-  Calendar,
-  ShieldCheck,
-  Star,
-  Luggage,
-  Users
+  Globe2, 
+  Calendar, 
+  ShieldCheck, 
+  Star, 
+  Luggage, 
+  User,
+  CheckCircle2,
+  Navigation,
+  Bot,
+  CloudSun
 } from 'lucide-react';
 
 const FEATURED_DESTINATIONS = [
@@ -28,9 +32,11 @@ const FEATURED_DESTINATIONS = [
 ];
 
 export default function LoginPage() {
-  const { signIn, loginAsGuest } = useAuth();
+  const { signIn, signUp, loginAsGuest } = useAuth();
   const { navigate } = useRouter();
 
+  const [authMode, setAuthMode] = useState('signin'); // 'signin' | 'signup'
+  const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -40,6 +46,10 @@ export default function LoginPage() {
 
   const validate = () => {
     const errs = {};
+    if (authMode === 'signup' && !fullName.trim()) {
+      errs.fullName = 'Full name is required';
+    }
+
     if (!email.trim()) {
       errs.email = 'Email address is required';
     } else if (!/\S+@\S+\.\S+/.test(email)) {
@@ -64,14 +74,23 @@ export default function LoginPage() {
 
     setLoading(true);
     try {
-      const { data, error } = await signIn(email.trim(), password);
-      if (error) {
-        setServerError(error.message || 'Invalid email or password');
-      } else if (data?.user) {
-        navigate('/');
+      if (authMode === 'signin') {
+        const { data, error } = await signIn(email.trim(), password);
+        if (error) {
+          setServerError(error.message || 'Invalid email or password');
+        } else if (data?.user) {
+          navigate('/plan');
+        }
+      } else {
+        const { data, error } = await signUp(email.trim(), password, fullName.trim());
+        if (error) {
+          setServerError(error.message || 'Signup failed. Please try again.');
+        } else {
+          navigate('/plan');
+        }
       }
     } catch (err) {
-      setServerError(err.message || 'An unexpected error occurred during sign in');
+      setServerError(err.message || 'An unexpected error occurred');
     } finally {
       setLoading(false);
     }
@@ -79,7 +98,7 @@ export default function LoginPage() {
 
   const handleGuestContinue = () => {
     loginAsGuest();
-    navigate('/');
+    navigate('/plan');
   };
 
   return (
@@ -94,7 +113,7 @@ export default function LoginPage() {
         {/* Left Side: Editorial Travel Showcase */}
         <div className="travel-showcase-panel editorial-layout">
           <div className="showcase-header-row">
-            <div className="brand-pill-badge">
+            <div className="brand-pill-badge" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
               <Compass size={16} className="brand-spin-icon" />
               <span>WanderPlan AI</span>
             </div>
@@ -139,21 +158,31 @@ export default function LoginPage() {
 
               <div className="feature-grid-item">
                 <div className="feature-icon-wrapper">
-                  <MapPin size={17} color="#34d399" />
+                  <Navigation size={17} color="#34d399" />
                 </div>
                 <div>
-                  <h4>Hidden Gems & Local Spots</h4>
-                  <p>Skip generic tourist traps with verified gems.</p>
+                  <h4>Interactive GPS & Map Routes</h4>
+                  <p>Numbered pins, walking times, and 1-click navigation.</p>
                 </div>
               </div>
 
               <div className="feature-grid-item">
                 <div className="feature-icon-wrapper">
-                  <Globe2 size={17} color="#818cf8" />
+                  <CloudSun size={17} color="#f59e0b" />
                 </div>
                 <div>
-                  <h4>Multi-Currency & Weather</h4>
-                  <p>Real-time exchange conversion & live forecasts.</p>
+                  <h4>Live Weather & Smart Packing</h4>
+                  <p>Open-Meteo forecasts and auto-generated checklists.</p>
+                </div>
+              </div>
+
+              <div className="feature-grid-item">
+                <div className="feature-icon-wrapper">
+                  <Bot size={17} color="#c084fc" />
+                </div>
+                <div>
+                  <h4>Ask WanderBot Concierge</h4>
+                  <p>24/7 assistant for customs, transit, and secret spots.</p>
                 </div>
               </div>
             </div>
@@ -172,22 +201,54 @@ export default function LoginPage() {
           </div>
         </div>
 
-        {/* Right Side: Sleek Modern Traveler Login Form */}
+        {/* Right Side: Sleek Modern Traveler Auth Form */}
         <div className="travel-form-panel">
           <div className="form-inner">
             <div className="form-brand-header">
               <div className="login-logo-pill">
                 <Luggage size={24} color="#38bdf8" />
               </div>
-              <h2 className="form-title">Welcome, Explorer</h2>
-              <p className="form-subtitle">Sign in to start creating your dream itineraries, view saved routes, and access smart budgets.</p>
+              <h2 className="form-title">
+                {authMode === 'signin' ? 'Welcome Back, Explorer' : 'Create Traveler Account'}
+              </h2>
+              <p className="form-subtitle">
+                {authMode === 'signin' 
+                  ? 'Sign in to access your saved trips, custom routes, and offline bookmarks.'
+                  : 'Join WanderPlan to build, customize, and share unlimited travel itineraries.'}
+              </p>
+            </div>
+
+            {/* Mode Switch Tabs */}
+            <div className="auth-tab-switch" style={{ marginBottom: '1.25rem' }}>
+              <button
+                type="button"
+                className={`auth-tab ${authMode === 'signin' ? 'active' : ''}`}
+                onClick={() => {
+                  setAuthMode('signin');
+                  setServerError(null);
+                  setErrors({});
+                }}
+              >
+                Sign In
+              </button>
+              <button
+                type="button"
+                className={`auth-tab ${authMode === 'signup' ? 'active' : ''}`}
+                onClick={() => {
+                  setAuthMode('signup');
+                  setServerError(null);
+                  setErrors({});
+                }}
+              >
+                Create Account
+              </button>
             </div>
 
             {/* One-click Instant Guest Explorer Action */}
             <div className="guest-quickstart-banner">
               <div className="guest-banner-text">
                 <strong>Just exploring?</strong>
-                <span>Try the full planner without creating an account</span>
+                <span>Try the full planner without signing in</span>
               </div>
               <button
                 type="button"
@@ -200,7 +261,7 @@ export default function LoginPage() {
             </div>
 
             <div className="auth-divider-line">
-              <span>or sign in with email</span>
+              <span>{authMode === 'signin' ? 'or sign in with email' : 'or register with email'}</span>
             </div>
 
             {serverError && (
@@ -211,6 +272,29 @@ export default function LoginPage() {
             )}
 
             <form onSubmit={handleSubmit} className="auth-form" noValidate>
+              {authMode === 'signup' && (
+                <div className="form-group">
+                  <label htmlFor="login-name">
+                    <User size={15} color="#38bdf8" /> Full Name
+                  </label>
+                  <div className="input-with-icon">
+                    <input
+                      id="login-name"
+                      type="text"
+                      placeholder="Amelia Earhart"
+                      value={fullName}
+                      onChange={(e) => {
+                        setFullName(e.target.value);
+                        if (errors.fullName) setErrors({ ...errors, fullName: null });
+                      }}
+                      className={`input-text ${errors.fullName ? 'input-error' : ''}`}
+                      disabled={loading}
+                    />
+                  </div>
+                  {errors.fullName && <span className="field-error">{errors.fullName}</span>}
+                </div>
+              )}
+
               <div className="form-group">
                 <label htmlFor="login-email">
                   <Mail size={15} color="#38bdf8" /> Email Address
@@ -242,7 +326,7 @@ export default function LoginPage() {
                   <input
                     id="login-password"
                     type={showPassword ? 'text' : 'password'}
-                    placeholder="Enter your password"
+                    placeholder="Enter your password (min 6 chars)"
                     value={password}
                     onChange={(e) => {
                       setPassword(e.target.value);
@@ -269,11 +353,11 @@ export default function LoginPage() {
                 {loading ? (
                   <>
                     <Loader2 size={18} className="spinner" />
-                    <span>Signing in...</span>
+                    <span>{authMode === 'signin' ? 'Signing in...' : 'Creating Account...'}</span>
                   </>
                 ) : (
                   <>
-                    <span>Sign In to WanderPlan</span>
+                    <span>{authMode === 'signin' ? 'Sign In to WanderPlan' : 'Create Free Account'}</span>
                     <ArrowRight size={17} />
                   </>
                 )}
@@ -282,13 +366,22 @@ export default function LoginPage() {
 
             <div className="auth-footer-notes">
               <p>
-                New here?{' '}
-                <Link to="/signup" className="auth-neon-link">
-                  Create Traveler Account
-                </Link>
+                {authMode === 'signin' ? "Don't have an account? " : 'Already have an account? '}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAuthMode(authMode === 'signin' ? 'signup' : 'signin');
+                    setServerError(null);
+                    setErrors({});
+                  }}
+                  className="auth-neon-link"
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', font: 'inherit', padding: 0 }}
+                >
+                  {authMode === 'signin' ? 'Create Account' : 'Sign In'}
+                </button>
               </p>
               <div className="security-guarantee">
-                <ShieldCheck size={14} color="#34d399" /> 100% Free to start • Instant Itinerary Generation
+                <ShieldCheck size={14} color="#34d399" /> 100% Free Forever • Instant Itinerary Generation
               </div>
             </div>
           </div>

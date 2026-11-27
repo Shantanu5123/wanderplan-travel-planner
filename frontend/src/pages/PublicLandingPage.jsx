@@ -108,63 +108,9 @@ export default function PublicLandingPage({ onQuickStart }) {
     }
   };
 
-  // Auth Form State inside Section 3
-  const [authMode, setAuthMode] = useState('signin'); // 'signin' | 'signup'
-  const [authEmail, setAuthEmail] = useState('');
-  const [authPassword, setAuthPassword] = useState('');
-  const [authName, setAuthName] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [authLoading, setAuthLoading] = useState(false);
-  const [authError, setAuthError] = useState(null);
-
-  const handleAuthSubmit = async (e) => {
-    e.preventDefault();
-    setAuthError(null);
-
-    if (!authEmail.trim() || !/\S+@\S+\.\S+/.test(authEmail)) {
-      setAuthError('Please enter a valid email address');
-      return;
-    }
-    if (!authPassword || authPassword.length < 6) {
-      setAuthError('Password must be at least 6 characters');
-      return;
-    }
-
-    setAuthLoading(true);
-    try {
-      if (authMode === 'signin') {
-        const { error } = await signIn(authEmail, authPassword);
-        if (error) throw error;
-        navigate('/plan');
-      } else {
-        const { error } = await signUp(authEmail, authPassword, authName);
-        if (error) throw error;
-        navigate('/plan');
-      }
-    } catch (err) {
-      setAuthError(err.message || 'Authentication failed. Please try again.');
-    } finally {
-      setAuthLoading(false);
-    }
-  };
-
   const handleGuestLogin = () => {
     loginAsGuest();
     navigate('/plan');
-  };
-
-  const scrollToAuth = () => {
-    const el = document.getElementById('auth-section');
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
-  const scrollToExplore = () => {
-    const el = document.getElementById('explore-preview-section');
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
-    }
   };
 
   return (
@@ -201,7 +147,7 @@ export default function PublicLandingPage({ onQuickStart }) {
               <span>AI Planner</span>
             </button>
             <button 
-              onClick={scrollToAuth} 
+              onClick={() => navigate('/login')} 
               className="scrolly-nav-auth-btn"
             >
               <span>Sign In</span>
@@ -763,149 +709,62 @@ export default function PublicLandingPage({ onQuickStart }) {
         </div>
       </section>
 
-      {/* 5. Section 4: Final Reveal — Glassmorphic Auth & Guest Access (`#auth-section`) */}
-      <section id="auth-section" className="scrolly-auth-section">
+      {/* 5. Section 4: Final Reveal — High-Impact "Start Exploring" CTA Banner */}
+      <section id="explore-cta-section" className="scrolly-auth-section">
         <motion.div 
-          className="auth-reveal-card glass-card"
-          initial={{ opacity: 0, scale: 0.95 }}
-          whileInView={{ opacity: 1, scale: 1 }}
+          className="auth-reveal-card glass-card explore-callout-card"
+          initial={{ opacity: 0, scale: 0.95, y: 30 }}
+          whileInView={{ opacity: 1, scale: 1, y: 0 }}
           viewport={{ once: true, margin: '-60px' }}
           transition={{ duration: 0.6, ease: 'easeOut' }}
         >
           <div className="auth-card-header text-center">
-            <div className="auth-logo-badge">
-              <Compass size={24} className="text-cyan-400" />
+            <div className="auth-logo-badge pulse-badge">
+              <Compass size={28} className="text-cyan-400" />
             </div>
-            <h2 className="text-2xl md:text-3xl font-extrabold text-white mt-3 mb-1">
-              {authMode === 'signin' ? 'Welcome Back to WanderPlan' : 'Begin Your Travel Odyssey'}
+            <span className="section-pill mt-3 mb-2">Ready For Your Next Journey?</span>
+            <h2 className="text-3xl md:text-4xl font-extrabold text-white mt-1 mb-3">
+              Start Designing Your Custom Itinerary Now
             </h2>
-            <p className="text-slate-400 text-sm max-w-sm mx-auto">
-              {authMode === 'signin' 
-                ? 'Sign in to access your saved trips, bookmarks, and personalized itineraries.'
-                : 'Create your free account in seconds. No credit card required.'}
+            <p className="text-slate-300 text-base max-w-lg mx-auto leading-relaxed">
+              Join thousands of globetrotters who turn spontaneous trip ideas into day-by-day routes, budgets, packing lists, and GPS waypoints.
             </p>
           </div>
 
-          {/* Mode Switch Tabs */}
-          <div className="auth-tab-switch">
+          {/* Quick Action Matrix */}
+          <div className="cta-action-matrix">
             <button
-              type="button"
-              className={`auth-tab ${authMode === 'signin' ? 'active' : ''}`}
-              onClick={() => {
-                setAuthMode('signin');
-                setAuthError(null);
-              }}
+              onClick={() => navigate('/plan')}
+              className="cta-primary-button"
             >
-              Sign In
+              <Sparkles size={18} />
+              <span>Let's Explore & Plan</span>
+              <ArrowRight size={18} />
             </button>
+
             <button
-              type="button"
-              className={`auth-tab ${authMode === 'signup' ? 'active' : ''}`}
-              onClick={() => {
-                setAuthMode('signup');
-                setAuthError(null);
-              }}
+              onClick={() => navigate('/login')}
+              className="cta-secondary-button"
             >
-              Create Account
+              <User size={17} />
+              <span>Sign In / Create Account</span>
             </button>
           </div>
 
-          {authError && (
-            <div className="auth-error-banner">
-              <AlertCircle size={16} className="text-red-400 shrink-0" />
-              <span className="text-xs text-red-300">{authError}</span>
+          <div className="cta-perks-row">
+            <div className="cta-perk-item">
+              <CheckCircle2 size={15} className="text-emerald-400" />
+              <span>100% Free Forever</span>
             </div>
-          )}
-
-          <form onSubmit={handleAuthSubmit} className="auth-input-form">
-            {authMode === 'signup' && (
-              <div className="auth-field-group">
-                <label className="auth-label">Full Name</label>
-                <div className="auth-field-wrap">
-                  <User size={16} className="field-icon text-slate-400" />
-                  <input
-                    type="text"
-                    placeholder="Amelia Earhart"
-                    value={authName}
-                    onChange={(e) => setAuthName(e.target.value)}
-                    className="auth-text-input"
-                  />
-                </div>
-              </div>
-            )}
-
-            <div className="auth-field-group">
-              <label className="auth-label">Email Address</label>
-              <div className="auth-field-wrap">
-                <Mail size={16} className="field-icon text-slate-400" />
-                <input
-                  type="email"
-                  placeholder="traveler@wanderplan.ai"
-                  value={authEmail}
-                  onChange={(e) => setAuthEmail(e.target.value)}
-                  className="auth-text-input"
-                  required
-                />
-              </div>
+            <div className="cta-perk-item">
+              <CheckCircle2 size={15} className="text-cyan-400" />
+              <span>No Credit Card Required</span>
             </div>
-
-            <div className="auth-field-group">
-              <label className="auth-label">Password</label>
-              <div className="auth-field-wrap">
-                <Lock size={16} className="field-icon text-slate-400" />
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder="••••••••"
-                  value={authPassword}
-                  onChange={(e) => setAuthPassword(e.target.value)}
-                  className="auth-text-input"
-                  required
-                />
-                <button
-                  type="button"
-                  className="field-toggle-eye"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                </button>
-              </div>
+            <div className="cta-perk-item">
+              <CheckCircle2 size={15} className="text-amber-400" />
+              <span>Instant AI Generation</span>
             </div>
-
-            <button
-              type="submit"
-              disabled={authLoading}
-              className="auth-submit-btn"
-            >
-              {authLoading ? (
-                <>
-                  <Loader2 size={16} className="animate-spin" />
-                  <span>Processing...</span>
-                </>
-              ) : (
-                <>
-                  <span>{authMode === 'signin' ? 'Sign In to WanderPlan' : 'Create Free Account'}</span>
-                  <ArrowRight size={16} />
-                </>
-              )}
-            </button>
-          </form>
-
-          {/* Divider */}
-          <div className="auth-divider-row">
-            <span className="divider-line"></span>
-            <span className="divider-text">OR EXPERIENCE AS GUEST</span>
-            <span className="divider-line"></span>
           </div>
-
-          {/* Prominent Continue as Guest Button */}
-          <button
-            type="button"
-            onClick={handleGuestLogin}
-            className="guest-access-btn"
-          >
-            <Sparkles size={16} className="text-cyan-400" />
-            <span>Continue as Guest Explorer (Instant Access)</span>
-          </button>
         </motion.div>
       </section>
     </div>
