@@ -92,6 +92,21 @@ class GroqItineraryService:
         raw_json_str = response.choices[0].message.content
         parsed = json.loads(raw_json_str)
 
+        # Handle edge case where LLM returns a list or wraps in a top-level key
+        if isinstance(parsed, list):
+            parsed = {
+                "destination": req.destination,
+                "summary": f"Custom itinerary for {req.destination}",
+                "estimated_total_cost": "$800 - $1500",
+                "days": parsed
+            }
+        elif isinstance(parsed, dict) and "days" not in parsed:
+            # Check if days are nested inside an inner object
+            for k, v in parsed.items():
+                if isinstance(v, list) and len(v) > 0 and isinstance(v[0], dict) and "activities" in v[0]:
+                    parsed["days"] = v
+                    break
+
         # Ensure destination is present
         if "destination" not in parsed or not parsed["destination"]:
             parsed["destination"] = req.destination
