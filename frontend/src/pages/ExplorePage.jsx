@@ -56,27 +56,27 @@ export const CURATED_ITINERARIES = [
         day_number: 2,
         theme: 'Bamboo Groves & Western Wonders',
         activities: [
-          { time_slot: 'Morning', title: 'Arashiyama Bamboo Grove & Tenryu-ji', description: 'Towering green bamboo stalks swaying with the wind, followed by UNESCO temple grounds.', location: 'Ukyo Ward, Kyoto', cost_estimate: '$4', travel_tips: 'Rent a bicycle near the station for easy exploring.' },
-          { time_slot: 'Afternoon', title: 'Iwatayama Monkey Park', description: 'Hike up to meet wild Japanese macaques with panoramic Kyoto city views.', location: 'Arashiyama, Kyoto', cost_estimate: '$6', travel_tips: 'Wear comfortable walking shoes.' },
-          { time_slot: 'Evening', title: 'Matcha Parfait & Riverside Walk', description: 'Relax by Katsura River and enjoy authentic Uji matcha desserts.', location: 'Arashiyama Riverside', cost_estimate: '$9', travel_tips: 'Stroll across the historic Togetsukyo bridge at dusk.' }
+          { time_slot: 'Morning', title: 'Arashiyama Bamboo Grove & Tenryu-ji', description: 'Towering green bamboo stalks swaying with the wind, followed by UNESCO temple grounds.', location: 'Ukyo Ward, Kyoto', cost_estimate: '$4', travel_tips: 'Rent a bicycle near the station for easy exploring.', latitude: 35.0170, longitude: 135.6713 },
+          { time_slot: 'Afternoon', title: 'Iwatayama Monkey Park', description: 'Hike up to meet wild Japanese macaques with panoramic Kyoto city views.', location: 'Arashiyama, Kyoto', cost_estimate: '$6', travel_tips: 'Wear comfortable walking shoes.', latitude: 35.0105, longitude: 135.6766 },
+          { time_slot: 'Evening', title: 'Matcha Parfait & Riverside Walk', description: 'Relax by Katsura River and enjoy authentic Uji matcha desserts.', location: 'Arashiyama Riverside', cost_estimate: '$9', travel_tips: 'Stroll across the historic Togetsukyo bridge at dusk.', latitude: 35.0128, longitude: 135.6778 }
         ]
       },
       {
         day_number: 3,
         theme: 'Golden Pavilions & Philosopher’s Trail',
         activities: [
-          { time_slot: 'Morning', title: 'Kinkaku-ji (Golden Pavilion)', description: 'Marvel at the top two floors of the Zen temple covered in pure gold leaf shimmering over Mirror Pond.', location: 'Kita Ward, Kyoto', cost_estimate: '$4', travel_tips: 'Sunlight hits the gold facade best between 9-11 AM.' },
-          { time_slot: 'Afternoon', title: 'Philosopher’s Path & Ginkaku-ji', description: 'A scenic stone path along a canal lined with cherry trees connecting temples.', location: 'Sakyo Ward, Kyoto', cost_estimate: '$4', travel_tips: 'Stop by local artisan pottery craft shops.' },
-          { time_slot: 'Evening', title: 'Pontocho Alley Izakaya Hop', description: 'Atmospheric narrow pedestrian alley packed with wooden eateries and riverside dining.', location: 'Pontocho, Nakagyo', cost_estimate: '$25', travel_tips: 'Reserve in advance for open-air river platform seating (kawayuka).' }
+          { time_slot: 'Morning', title: 'Kinkaku-ji (Golden Pavilion)', description: 'Marvel at the top two floors of the Zen temple covered in pure gold leaf shimmering over Mirror Pond.', location: 'Kita Ward, Kyoto', cost_estimate: '$4', travel_tips: 'Sunlight hits the gold facade best between 9-11 AM.', latitude: 35.0394, longitude: 135.7292 },
+          { time_slot: 'Afternoon', title: 'Philosopher’s Path & Ginkaku-ji', description: 'A scenic stone path along a canal lined with cherry trees connecting temples.', location: 'Sakyo Ward, Kyoto', cost_estimate: '$4', travel_tips: 'Stop by local artisan pottery craft shops.', latitude: 35.0272, longitude: 135.7982 },
+          { time_slot: 'Evening', title: 'Pontocho Alley Izakaya Hop', description: 'Atmospheric narrow pedestrian alley packed with wooden eateries and riverside dining.', location: 'Pontocho, Nakagyo', cost_estimate: '$25', travel_tips: 'Reserve in advance for open-air river platform seating (kawayuka).', latitude: 35.0061, longitude: 135.7712 }
         ]
       },
       {
         day_number: 4,
         theme: 'Nishiki Market & Kiyomizu-dera Vista',
         activities: [
-          { time_slot: 'Morning', title: 'Kiyomizu-dera Veranda', description: 'Iconic wooden temple terrace perched without a single nail overlooking cedar trees.', location: 'Higashiyama, Kyoto', cost_estimate: '$3', travel_tips: 'Drink from Otowa Waterfall for health and success.' },
-          { time_slot: 'Mid-day', title: 'Nishiki Market Street Food Tour', description: 'Known as "Kyoto\'s Kitchen", savor grilled octopus skewers, dashi tamagoyaki, and mochi.', location: 'Downtown Kyoto', cost_estimate: '$15', travel_tips: 'Eat at designated food stall counters.' },
-          { time_slot: 'Evening', title: 'Sunset from Yasaka Pagoda (Ninenzaka)', description: 'Photogenic cobblestone slopes framed by ancient five-story wooden pagoda.', location: 'Ninenzaka, Kyoto', cost_estimate: 'Free', travel_tips: 'The magic hour right after lanterns turn on is breathtaking.' }
+          { time_slot: 'Morning', title: 'Kiyomizu-dera Veranda', description: 'Iconic wooden temple terrace perched without a single nail overlooking cedar trees.', location: 'Higashiyama, Kyoto', cost_estimate: '$3', travel_tips: 'Drink from Otowa Waterfall for health and success.', latitude: 34.9949, longitude: 135.7850 },
+          { time_slot: 'Mid-day', title: 'Nishiki Market Street Food Tour', description: 'Known as "Kyoto\'s Kitchen", savor grilled octopus skewers, dashi tamagoyaki, and mochi.', location: 'Downtown Kyoto', cost_estimate: '$15', travel_tips: 'Eat at designated food stall counters.', latitude: 35.0050, longitude: 135.7649 },
+          { time_slot: 'Evening', title: 'Sunset from Yasaka Pagoda (Ninenzaka)', description: 'Photogenic cobblestone slopes framed by ancient five-story wooden pagoda.', location: 'Ninenzaka, Kyoto', cost_estimate: 'Free', travel_tips: 'The magic hour right after lanterns turn on is breathtaking.', latitude: 34.9986, longitude: 135.7797 }
         ]
       }
     ]
