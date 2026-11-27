@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -11,13 +11,13 @@ function MapRecenter({ center, zoom, bounds }) {
     if (bounds && bounds.length > 1) {
       map.fitBounds(bounds, { padding: [40, 40], maxZoom: 15, animate: true, duration: 0.8 });
     } else if (center) {
-      map.flyTo(center, zoom || 14, { animate: true, duration: 0.8 });
+      map.flyTo(center, zoom || 13, { animate: true, duration: 0.8 });
     }
   }, [center, zoom, bounds, map]);
   return null;
 }
 
-// Fallback coordinate mapping for top global destinations if coordinates are missing
+// Comprehensive global destination coordinate index
 const DESTINATION_COORDS = {
   tokyo: [35.6762, 139.6503],
   kyoto: [35.0116, 135.7681],
@@ -37,15 +37,61 @@ const DESTINATION_COORDS = {
   florence: [43.7696, 11.2558],
   goa: [15.2993, 74.1240],
   jaipur: [26.9124, 75.7873],
+  reykjavik: [64.1466, -21.9426],
+  iceland: [64.1466, -21.9426],
+  amalfi: [40.6340, 14.6027],
+  positano: [40.6281, 14.4850],
+  venice: [45.4408, 12.3155],
+  delhi: [28.6139, 77.2090],
+  mumbai: [19.0760, 72.8777],
+  bangkok: [13.7563, 100.5018],
+  prague: [50.0755, 14.4378],
+  berlin: [52.5200, 13.4050],
+  vienna: [48.2082, 16.3738],
+  budapest: [47.4979, 19.0402],
+  lisbon: [38.7223, -9.1393],
+  cairo: [30.0444, 31.2357],
+  seoul: [37.5665, 126.9780],
+  hawaii: [21.3069, -157.8583],
+  cancun: [21.1619, -86.8515],
+  zermatt: [45.9765, 7.7491],
 };
 
 function getDestinationDefault(destination) {
-  if (!destination) return [48.8566, 2.3522]; // Default Paris
+  if (!destination) return [48.8566, 2.3522]; // Paris default
   const lower = destination.toLowerCase();
   for (const [key, coords] of Object.entries(DESTINATION_COORDS)) {
     if (lower.includes(key)) return coords;
   }
   return [48.8566, 2.3522];
+}
+
+// In-memory geocoding cache so Nominatim is only called once per location string
+const geocodeCache = new Map();
+
+async function geocodeLocation(placeName, cityContext = '') {
+  const query = [placeName, cityContext].filter(Boolean).join(', ');
+  if (!query) return null;
+  if (geocodeCache.has(query)) return geocodeCache.get(query);
+
+  try {
+    const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1`, {
+      headers: {
+        'Accept': 'application/json',
+      }
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.length > 0) {
+        const coords = [parseFloat(data[0].lat), parseFloat(data[0].lon)];
+        geocodeCache.set(query, coords);
+        return coords;
+      }
+    }
+  } catch (err) {
+    // Ignore network error and fall back gracefully
+  }
+  return null;
 }
 
 // Custom Leaflet DivIcon with glowing numbered badge
@@ -97,15 +143,37 @@ export default function ItineraryInteractiveMap({
   const { formatCost } = useCurrency();
   const markerRefs = useRef([]);
 
-  // Calculate coordinates for activities (generate offsets around city center if missing)
-  const defaultCityCenter = useMemo(() => getDestinationDefault(destination), [destination]);
+  const [geocodedCityCoords, setGeocodedCityCoords] = useState(null);
+
+  // Fallback city center coordinates from local dictionary
+  const fallbackCityCenter = useMemo(() => getDestinationDefault(destination), [destination]);
+
+  // If destination is not in our dictionary, geocode the city name dynamically
+  useEffect(() => {
+    let isMounted = true;
+    const lower = (destination || '').toLowerCase();
+    const hasDictMatch = Object.keys(DESTINATION_COORDS).some((k) => lower.includes(k));
+
+    if (!hasDictMatch && destination.trim()) {
+      geocodeLocation(destination.trim()).then((coords) => {
+        if (isMounted && coords) {
+          setGeocodedCityCoords(coords);
+        }
+      });
+    }
+    return () => {
+      isMounted = false;
+    };
+  }, [destination]);
+
+  const defaultCityCenter = geocodedCityCoords || fallbackCityCenter;
 
   const stops = useMemo(() => {
     return activities.map((act, index) => {
       let lat = typeof act.latitude === 'number' ? act.latitude : null;
       let lng = typeof act.longitude === 'number' ? act.longitude : null;
 
-      // If coordinates aren't returned by legacy items, generate structured spread points
+      // If coordinates aren't returned by legacy items, generate structured spread points around real city center
       if (!lat || !lng || isNaN(lat) || isNaN(lng)) {
         const offsetLat = (index - 1) * 0.012 + (index % 2 === 0 ? 0.006 : -0.006);
         const offsetLng = (index - 1) * 0.015 + (index % 2 === 0 ? -0.005 : 0.008);

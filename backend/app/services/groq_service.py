@@ -60,7 +60,7 @@ class GroqItineraryService:
             '    "documents": ["string", "string"]\n'
             "  }\n"
             "}\n"
-            "Crucial: Provide realistic, accurate floating-point latitude and longitude coordinates for each attraction/stop so they map precisely. Tailor the packing list directly to destination weather, local customs, and travel style.\n"
+            "Crucial Rule for Coordinates: You MUST provide strictly accurate real-world floating-point latitude and longitude coordinates for each attraction/stop situated precisely in the specified destination city. Never output Tokyo or placeholder coordinates for another city (e.g. if the trip is in Paris, latitude must be ~48.85 and longitude ~2.35; if in New York, ~40.71 and ~-74.00; if in Kyoto, ~35.01 and ~135.76). Tailor the packing list directly to destination weather, local customs, and travel style.\n"
             "Do not include any markdown formatting, preamble, or notes outside the JSON."
         )
 

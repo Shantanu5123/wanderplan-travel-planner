@@ -47,9 +47,9 @@ export const CURATED_ITINERARIES = [
         day_number: 1,
         theme: 'Historic Shrines & Southern Kyoto',
         activities: [
-          { time_slot: 'Morning', title: 'Fushimi Inari-taisha Hike', description: 'Early morning hike through thousands of vivid orange torii gates up Mount Inari.', location: 'Fushimi Ward, Kyoto', cost_estimate: 'Free', travel_tips: 'Arrive by 7:30 AM to beat tour buses.' },
-          { time_slot: 'Afternoon', title: 'Tofuku-ji Zen Gardens', description: 'Stroll across Tsutenkyo Bridge overlooking maple valleys and dry rock gardens.', location: 'Higashiyama, Kyoto', cost_estimate: '$5', travel_tips: 'Ideal spot for tranquil meditation.' },
-          { time_slot: 'Evening', title: 'Traditional Ramen at Gion Duck Noodles', description: 'French-inspired duck broth ramen in a cozy hidden alley.', location: 'Gion, Kyoto', cost_estimate: '$12', travel_tips: 'Cash preferred; look for the duck emoji sign.' }
+          { time_slot: 'Morning', title: 'Fushimi Inari-taisha Hike', description: 'Early morning hike through thousands of vivid orange torii gates up Mount Inari.', location: 'Fushimi Ward, Kyoto', cost_estimate: 'Free', travel_tips: 'Arrive by 7:30 AM to beat tour buses.', latitude: 34.9671, longitude: 135.7727 },
+          { time_slot: 'Afternoon', title: 'Tofuku-ji Zen Gardens', description: 'Stroll across Tsutenkyo Bridge overlooking maple valleys and dry rock gardens.', location: 'Higashiyama, Kyoto', cost_estimate: '$5', travel_tips: 'Ideal spot for tranquil meditation.', latitude: 34.9813, longitude: 135.7743 },
+          { time_slot: 'Evening', title: 'Traditional Ramen at Gion Duck Noodles', description: 'French-inspired duck broth ramen in a cozy hidden alley.', location: 'Gion, Kyoto', cost_estimate: '$12', travel_tips: 'Cash preferred; look for the duck emoji sign.', latitude: 35.0037, longitude: 135.7770 }
         ]
       },
       {
@@ -100,9 +100,9 @@ export const CURATED_ITINERARIES = [
         day_number: 1,
         theme: 'Positano Pastel Village & Beach Bliss',
         activities: [
-          { time_slot: 'Morning', title: 'Spiaggia Grande Stroll', description: 'Walk through Positano’s iconic pebble beach gazing up at cascade of pastel houses.', location: 'Positano Beach', cost_estimate: 'Free', travel_tips: 'Rent sunbed early if visiting in high season.' },
-          { time_slot: 'Afternoon', title: 'Boutique Shopping & Limoncello Tasting', description: 'Browse handmade linen clothes, ceramics, and sample freshly brewed iced limoncello.', location: 'Via dei Mulini', cost_estimate: '$20', travel_tips: 'Locals make the best lemon sorbet inside real frozen lemons.' },
-          { time_slot: 'Evening', title: 'Sunset Cocktails at Franco’s Bar', description: 'Panoramic cliffside outdoor terrace overlooking the Mediterranean with stylish music.', location: 'Positano Clifftop', cost_estimate: '$35', travel_tips: 'Arrive 45 mins before sunset as there are no reservations.' }
+          { time_slot: 'Morning', title: 'Spiaggia Grande Stroll', description: 'Walk through Positano’s iconic pebble beach gazing up at cascade of pastel houses.', location: 'Positano Beach', cost_estimate: 'Free', travel_tips: 'Rent sunbed early if visiting in high season.', latitude: 40.6288, longitude: 14.4866 },
+          { time_slot: 'Afternoon', title: 'Boutique Shopping & Limoncello Tasting', description: 'Browse handmade linen clothes, ceramics, and sample freshly brewed iced limoncello.', location: 'Via dei Mulini', cost_estimate: '$20', travel_tips: 'Locals make the best lemon sorbet inside real frozen lemons.', latitude: 40.6295, longitude: 14.4855 },
+          { time_slot: 'Evening', title: 'Sunset Cocktails at Franco’s Bar', description: 'Panoramic cliffside outdoor terrace overlooking the Mediterranean with stylish music.', location: 'Positano Clifftop', cost_estimate: '$35', travel_tips: 'Arrive 45 mins before sunset as there are no reservations.', latitude: 40.6299, longitude: 14.4878 }
         ]
       },
       {
@@ -153,9 +153,9 @@ export const CURATED_ITINERARIES = [
         day_number: 1,
         theme: 'Reykjavik City & Geothermal Rejuvenation',
         activities: [
-          { time_slot: 'Morning', title: 'Hallgrimskirkja Church & Tower', description: 'Iconic volcanic basalt-inspired church with 360-degree views of Reykjavik’s colorful roofs.', location: 'Reykjavik Center', cost_estimate: '$10', travel_tips: 'Take the elevator to the tower observatory.' },
-          { time_slot: 'Afternoon', title: 'Sky Lagoon Geothermal Ocean Bath', description: 'Infinity geothermal pool cliffside with a 7-step Nordic bathing ritual overlooking the North Atlantic.', location: 'Kársnes Harbour', cost_estimate: '$65', travel_tips: 'Includes cold plunge, sauna with glass ocean window, and scrub.' },
-          { time_slot: 'Evening', title: 'Bæjarins Beztu Pylsur & Harpa Hall', description: 'Taste Iceland’s legendary lamb hot dog, followed by a walk through Harpa’s glowing glass honeycomb.', location: 'Old Harbour, Reykjavik', cost_estimate: '$8', travel_tips: 'Order the hot dog "eina með öllu" (with everything).' }
+          { time_slot: 'Morning', title: 'Hallgrimskirkja Church & Tower', description: 'Iconic volcanic basalt-inspired church with 360-degree views of Reykjavik’s colorful roofs.', location: 'Reykjavik Center', cost_estimate: '$10', travel_tips: 'Take the elevator to the tower observatory.', latitude: 64.1417, longitude: -21.9266 },
+          { time_slot: 'Afternoon', title: 'Sky Lagoon Geothermal Ocean Bath', description: 'Infinity geothermal pool cliffside with a 7-step Nordic bathing ritual overlooking the North Atlantic.', location: 'Kársnes Harbour', cost_estimate: '$65', travel_tips: 'Includes cold plunge, sauna with glass ocean window, and scrub.', latitude: 64.1166, longitude: -21.9482 },
+          { time_slot: 'Evening', title: 'Bæjarins Beztu Pylsur & Harpa Hall', description: 'Taste Iceland’s legendary lamb hot dog, followed by a walk through Harpa’s glowing glass honeycomb.', location: 'Old Harbour, Reykjavik', cost_estimate: '$8', travel_tips: 'Order the hot dog "eina með öllu" (with everything).', latitude: 64.1504, longitude: -21.9330 }
         ]
       },
       {
@@ -215,9 +215,9 @@ export const CURATED_ITINERARIES = [
         day_number: 1,
         theme: 'Iconic Landmarks & Sunset on the Seine',
         activities: [
-          { time_slot: 'Morning', title: 'Trocadéro View & Eiffel Tower Grounds', description: 'Get the best perspective of the Iron Lady from the Trocadéro marble terrace.', location: 'Champ de Mars, Paris', cost_estimate: 'Free', travel_tips: 'Arrive at sunrise for magical light with zero crowds.' },
-          { time_slot: 'Afternoon', title: 'Musée d’Orsay Impressionists', description: 'Gaze upon Monet, Van Gogh, and Renoir paintings inside an ornate converted Beaux-Arts railway station.', location: '7th arrondissement', cost_estimate: '$17', travel_tips: 'Don\'t miss the giant station clock face view overlooking Sacré-Cœur.' },
-          { time_slot: 'Evening', title: 'Vedettes du Pont Neuf Seine Cruise', description: '1-hour illuminated cruise passing Notre-Dame, Île de la Cité, and sparking Eiffel Tower.', location: 'Pont Neuf', cost_estimate: '$15', travel_tips: 'Time the cruise so you pass the Eiffel Tower at the top of the hour when it sparkles.' }
+          { time_slot: 'Morning', title: 'Trocadéro View & Eiffel Tower Grounds', description: 'Get the best perspective of the Iron Lady from the Trocadéro marble terrace.', location: 'Champ de Mars, Paris', cost_estimate: 'Free', travel_tips: 'Arrive at sunrise for magical light with zero crowds.', latitude: 48.8624, longitude: 2.2872 },
+          { time_slot: 'Afternoon', title: 'Musée d’Orsay Impressionists', description: 'Gaze upon Monet, Van Gogh, and Renoir paintings inside an ornate converted Beaux-Arts railway station.', location: '7th arrondissement', cost_estimate: '$17', travel_tips: 'Don\'t miss the giant station clock face view overlooking Sacré-Cœur.', latitude: 48.8599, longitude: 2.3265 },
+          { time_slot: 'Evening', title: 'Vedettes du Pont Neuf Seine Cruise', description: '1-hour illuminated cruise passing Notre-Dame, Île de la Cité, and sparking Eiffel Tower.', location: 'Pont Neuf', cost_estimate: '$15', travel_tips: 'Time the cruise so you pass the Eiffel Tower at the top of the hour when it sparkles.', latitude: 48.8570, longitude: 2.3413 }
         ]
       },
       {
@@ -268,9 +268,9 @@ export const CURATED_ITINERARIES = [
         day_number: 1,
         theme: 'Sky-High Downtown & Fountain Wonders',
         activities: [
-          { time_slot: 'Morning', title: 'Burj Khalifa Observation Deck', description: 'Elevate to Level 124 & 125 for unmatched vistas of the skyline, desert edge, and ocean.', location: 'Downtown Dubai', cost_estimate: '$45', travel_tips: 'Book non-prime morning slot to skip massive queues.' },
-          { time_slot: 'Afternoon', title: 'Dubai Mall & Giant Aquarium', description: 'Explore the largest shopping complex in the world and view the 10-million-liter suspended aquarium.', location: 'Downtown Dubai', cost_estimate: 'Free ($30 inside tunnel)', travel_tips: 'Check out the indoor human waterfall installation.' },
-          { time_slot: 'Evening', title: 'Dubai Fountain Light & Water Show', description: 'Choreographed dancing fountains shooting water 150m high to international and Arabic tunes.', location: 'Burj Lake', cost_estimate: 'Free', travel_tips: 'Shows run every 30 minutes starting at 6:00 PM.' }
+          { time_slot: 'Morning', title: 'Burj Khalifa Observation Deck', description: 'Elevate to Level 124 & 125 for unmatched vistas of the skyline, desert edge, and ocean.', location: 'Downtown Dubai', cost_estimate: '$45', travel_tips: 'Book non-prime morning slot to skip massive queues.', latitude: 25.1972, longitude: 55.2744 },
+          { time_slot: 'Afternoon', title: 'Dubai Mall & Giant Aquarium', description: 'Explore the largest shopping complex in the world and view the 10-million-liter suspended aquarium.', location: 'Downtown Dubai', cost_estimate: 'Free ($30 inside tunnel)', travel_tips: 'Check out the indoor human waterfall installation.', latitude: 25.1975, longitude: 55.2797 },
+          { time_slot: 'Evening', title: 'Dubai Fountain Light & Water Show', description: 'Choreographed dancing fountains shooting water 150m high to international and Arabic tunes.', location: 'Burj Lake', cost_estimate: 'Free', travel_tips: 'Shows run every 30 minutes starting at 6:00 PM.', latitude: 25.1960, longitude: 55.2778 }
         ]
       },
       {
@@ -321,9 +321,9 @@ export const CURATED_ITINERARIES = [
         day_number: 1,
         theme: 'Colonial Latin Quarter & Mandovi River',
         activities: [
-          { time_slot: 'Morning', title: 'Fontainhas Heritage Walk', description: 'Wander through Panaji\'s historic Latin Quarter with vibrant yellow, blue, and terracotta Portuguese houses.', location: 'Fontainhas, Panaji', cost_estimate: 'Free', travel_tips: 'Pop into Confeitaria 31 De Janeiro for warm Bebinca cake.' },
-          { time_slot: 'Afternoon', title: 'Church of Our Lady of the Immaculate Conception', description: 'Stunning zigzag baroque staircase in the heart of the capital.', location: 'Panaji Church Square', cost_estimate: 'Free', travel_tips: 'Famous spot featured in numerous cinema scenes.' },
-          { time_slot: 'Evening', title: 'Authentic Goan Thali at Ritz Classic', description: 'Traditional seafood thali with kingfish fry, crab masala, tisrya (clams), and kadi.', location: '18th June Road, Panaji', cost_estimate: '$6', travel_tips: 'Sip on refreshing solkadhi (kokum coconut milk).' }
+          { time_slot: 'Morning', title: 'Fontainhas Heritage Walk', description: 'Wander through Panaji\'s historic Latin Quarter with vibrant yellow, blue, and terracotta Portuguese houses.', location: 'Fontainhas, Panaji', cost_estimate: 'Free', travel_tips: 'Pop into Confeitaria 31 De Janeiro for warm Bebinca cake.', latitude: 15.4950, longitude: 73.8300 },
+          { time_slot: 'Afternoon', title: 'Church of Our Lady of the Immaculate Conception', description: 'Stunning zigzag baroque staircase in the heart of the capital.', location: 'Panaji Church Square', cost_estimate: 'Free', travel_tips: 'Famous spot featured in numerous cinema scenes.', latitude: 15.4989, longitude: 73.8278 },
+          { time_slot: 'Evening', title: 'Authentic Goan Thali at Ritz Classic', description: 'Traditional seafood thali with kingfish fry, crab masala, tisrya (clams), and kadi.', location: '18th June Road, Panaji', cost_estimate: '$6', travel_tips: 'Sip on refreshing solkadhi (kokum coconut milk).', latitude: 15.4942, longitude: 73.8228 }
         ]
       },
       {
