@@ -102,27 +102,38 @@ function RouterOutlet() {
   return <PublicLandingPage onQuickStart={() => navigate('/plan')} />;
 }
 
+function AppContent() {
+  const { currentPath } = useRouter();
+  const isLanding = currentPath === '/';
+
+  return (
+    <div className="app-shell flex flex-col min-h-screen">
+      {/* Interactive Cursor Spotlight Glow */}
+      <CursorGlow />
+
+      {/* Render standard Navbar on all routes except the specialized landing page which has its own fixed glassmorphic nav */}
+      {!isLanding && <Navbar />}
+
+      <div className="flex-grow">
+        <RouterOutlet />
+      </div>
+
+      {/* Global Responsive Minimal Footer */}
+      <Footer />
+
+      {/* Persistent Bottom-Right "Ask WanderBot" Floating AI Widget */}
+      <FloatingChatbot />
+    </div>
+  );
+}
+
 function App() {
   return (
     <AuthProvider>
       <CurrencyProvider>
         <LanguageProvider>
           <HashRouter>
-            <div className="app-shell flex flex-col min-h-screen">
-              {/* Interactive Cursor Spotlight Glow */}
-              <CursorGlow />
-
-              <Navbar />
-              <div className="flex-grow">
-                <RouterOutlet />
-              </div>
-
-              {/* Global Responsive Minimal Footer */}
-              <Footer />
-
-              {/* Persistent Bottom-Right "Ask WanderBot" Floating AI Widget */}
-              <FloatingChatbot />
-            </div>
+            <AppContent />
           </HashRouter>
         </LanguageProvider>
       </CurrencyProvider>
