@@ -322,6 +322,46 @@ export default function TripPlanningForm() {
               {errors.interests && <span className="field-error">{errors.interests}</span>}
             </div>
 
+            {/* Optional Dietary & Mobility Preferences */}
+            <div className="form-group" style={{ background: 'rgba(255, 255, 255, 0.02)', padding: '1rem', borderRadius: '12px', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
+                <Sliders size={15} color="#38bdf8" />
+                <span style={{ fontSize: '0.92rem', fontWeight: 700, color: '#f1f5f9' }}>Dietary & Accessibility Preferences (Optional)</span>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '0.85rem' }}>
+                <div>
+                  <label htmlFor="dietary_notes" style={{ fontSize: '0.82rem', color: '#94a3b8', display: 'block', marginBottom: '0.35rem' }}>
+                    🥗 Dietary Notes (e.g. Vegetarian, Halal, Gluten-Free)
+                  </label>
+                  <input
+                    id="dietary_notes"
+                    type="text"
+                    className="input-text glow-focus"
+                    placeholder="e.g. Vegetarian, no shellfish"
+                    value={userPrefs?.dietary_notes || ''}
+                    onChange={(e) => setUserPrefs(prev => ({ ...prev, dietary_notes: e.target.value }))}
+                    disabled={loading}
+                    style={{ fontSize: '0.86rem', padding: '0.55rem 0.85rem' }}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="mobility_notes" style={{ fontSize: '0.82rem', color: '#94a3b8', display: 'block', marginBottom: '0.35rem' }}>
+                    🚶 Mobility & Pace Needs
+                  </label>
+                  <input
+                    id="mobility_notes"
+                    type="text"
+                    className="input-text glow-focus"
+                    placeholder="e.g. Avoid steep stairs, wheelchair accessible"
+                    value={userPrefs?.mobility_notes || ''}
+                    onChange={(e) => setUserPrefs(prev => ({ ...prev, mobility_notes: e.target.value }))}
+                    disabled={loading}
+                    style={{ fontSize: '0.86rem', padding: '0.55rem 0.85rem' }}
+                  />
+                </div>
+              </div>
+            </div>
+
             {/* Submit Button */}
             <button type="submit" className="submit-btn btn-glow-large" disabled={loading}>
               {loading ? (

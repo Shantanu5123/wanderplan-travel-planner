@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
+import { useCurrency } from '../context/CurrencyContext';
 import { useRouter, Link } from '../services/router';
 import { supabase } from '../services/supabaseClient';
 import { 
@@ -40,6 +41,7 @@ function getDestinationImage(destination = '') {
 export default function DashboardPage() {
   const { user, loading: authLoading } = useAuth();
   const { t } = useLanguage();
+  const { formatCost } = useCurrency();
   const { navigate } = useRouter();
 
   const [trips, setTrips] = useState([]);
@@ -205,7 +207,7 @@ export default function DashboardPage() {
           </div>
 
           <Link 
-            to="/" 
+            to="/plan" 
             className="btn-glow" 
             style={{ 
               padding: '0.75rem 1.4rem', 
@@ -236,7 +238,7 @@ export default function DashboardPage() {
             You haven't saved any trips yet. Generate your first day-by-day plan with AI
             and click <strong>"Save Trip"</strong> to see it here anytime.
           </p>
-          <Link to="/" className="btn-glow" style={{ padding: '0.75rem 1.5rem', borderRadius: '12px' }}>
+          <Link to="/plan" className="btn-glow" style={{ padding: '0.75rem 1.5rem', borderRadius: '12px' }}>
             <Sparkles size={16} /> Plan Your First Trip
           </Link>
         </div>
@@ -273,9 +275,9 @@ export default function DashboardPage() {
 
                   <div className="card-meta-pills">
                     <span><Clock size={12} /> {daysCount} Days</span>
-                    <span><DollarSign size={12} /> {trip.budget}</span>
+                    <span style={{ textTransform: 'capitalize' }}><DollarSign size={12} /> {trip.budget}</span>
                     {trip.itinerary_data?.estimated_total_cost && (
-                      <span>Est. {trip.itinerary_data.estimated_total_cost}</span>
+                      <span>Est. {formatCost(trip.itinerary_data.estimated_total_cost)}</span>
                     )}
                   </div>
 

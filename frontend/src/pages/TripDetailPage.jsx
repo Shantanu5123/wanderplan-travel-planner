@@ -83,24 +83,50 @@ export default function TripDetailPage({ tripId }) {
     daysList.forEach((day) => {
       day.activities?.forEach((act) => {
         if (!act.cost_estimate) return;
-        const matches = act.cost_estimate.match(/\d+[\d,]*/g);
-        if (matches && matches.length > 0) {
-          const numbers = matches.map((m) => parseFloat(m.replace(/,/g, ''))).filter((n) => !isNaN(n));
+        const str = act.cost_estimate;
+        // Prioritize explicit USD matches ($15, $20 - $35)
+        const dollarMatches = str.match(/\$\s*(\d+[\d,]*(\.\d+)?)/g);
+        if (dollarMatches && dollarMatches.length > 0) {
+          const numbers = dollarMatches
+            .map((m) => parseFloat(m.replace(/[^\d.]/g, '')))
+            .filter((n) => !isNaN(n));
           if (numbers.length === 1) {
             totalLow += numbers[0];
             totalHigh += numbers[0];
             count++;
           } else if (numbers.length >= 2) {
-            totalLow += numbers[0];
-            totalHigh += numbers[1];
+            const sorted = [...numbers].sort((a, b) => a - b);
+            totalLow += sorted[0];
+            totalHigh += sorted[sorted.length - 1];
             count++;
+          }
+          return;
+        }
+
+        // Fallback: match plain digits only if no local currency symbol (¥, ₹, €) precedes it
+        if (!/^[¥€£₹]/.test(str)) {
+          const matches = str.match(/\d+[\d,]*/g);
+          if (matches && matches.length > 0) {
+            const numbers = matches.map((m) => parseFloat(m.replace(/,/g, ''))).filter((n) => !isNaN(n));
+            if (numbers.length === 1) {
+              totalLow += numbers[0];
+              totalHigh += numbers[0];
+              count++;
+            } else if (numbers.length >= 2) {
+              const sorted = [...numbers].sort((a, b) => a - b);
+              totalLow += sorted[0];
+              totalHigh += sorted[sorted.length - 1];
+              count++;
+            }
           }
         }
       });
     });
 
     if (count === 0) return null;
-    return totalLow === totalHigh ? `$${totalLow}` : `$${totalLow} - $${totalHigh}`;
+    const roundedLow = Math.round(totalLow);
+    const roundedHigh = Math.round(totalHigh);
+    return roundedLow === roundedHigh ? `$${roundedLow}` : `$${roundedLow} - $${roundedHigh}`;
   };
 
   // Persist updated trip state to local cache & Supabase
@@ -528,7 +554,8 @@ export default function TripDetailPage({ tripId }) {
   const isExploreSample = Boolean(trip.fromExplore || (typeof trip.id === 'string' && trip.id.startsWith('curated_')));
   // Determine if viewing a shared trip owned by another user
   const isOwner = Boolean(user && trip?.user_id && user.id === trip.user_id);
-  const isSharedTripView = Boolean(trip?.is_public && !isOwner && !isExploreSample);
+  // Only consider it a shared read-only view if user is definitely NOT the owner and trip wasn't created by this guest/user
+  const isSharedTripView = Boolean(trip?.is_public && trip?.user_id && user && user.id !== trip.user_id && !isExploreSample);
 
   return (
     <div style={{ width: '100%', minHeight: '100vh', padding: '2.5rem 1rem 6rem 1rem' }}>

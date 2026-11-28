@@ -548,9 +548,9 @@ export default function PublicLandingPage({ onQuickStart }) {
                 </div>
 
                 <div className="mockup-packing-box">
-                  <div className="text-xs font-semibold text-slate-300 mb-2 flex items-center justify-between">
+                  <div className="text-xs font-semibold text-slate-300 mb-2 flex items-center justify-between" style={{ display: 'flex', justifyContent: 'space-between', gap: '0.75rem' }}>
                     <span>AI Packing Essentials</span>
-                    <span className="text-emerald-400">3/4 Packed</span>
+                    <span className="text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded text-[10px] font-bold">2/3 Packed</span>
                   </div>
                   <div className="packing-items-grid">
                     <div className="packing-item checked">

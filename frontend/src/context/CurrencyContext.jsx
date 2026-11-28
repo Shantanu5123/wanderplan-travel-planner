@@ -42,12 +42,27 @@ export function CurrencyProvider({ children }) {
       return rawCost;
     }
 
-    // Replace all dollar numbers (e.g. "$15", "$650 - $850", "15 USD") with converted currency
+    // Convert only USD dollar values (e.g. "$15", "$650 - $850", "$22 per person")
+    // or standard standalone ranges (e.g. "850 - 1,100").
+    // If the string starts with a non-dollar currency symbol (e.g. ¥, €, £, ₹), preserve or only convert the ($XX) portion.
+    if (/^[¥€£₹A-Za-z]/.test(rawCost) && !rawCost.startsWith('$')) {
+      // If it contains a bracketed dollar amount like "¥3,000 ($22)" or "(~ $25)"
+      if (/\$\s*\d+/.test(rawCost)) {
+        return rawCost.replace(/\$\s*(\d+[\d,]*(\.\d+)?)/g, (match, numberStr) => {
+          const num = parseFloat(numberStr.replace(/,/g, ''));
+          if (isNaN(num)) return match;
+          const converted = Math.round(num * currencyObj.rateToUSD);
+          return `${currencyObj.symbol}${converted.toLocaleString()}`;
+        });
+      }
+      return rawCost;
+    }
+
+    // Replace dollar amounts or numbers with converted currency symbol
     return rawCost.replace(/\$?\s*(\d+[\d,]*(\.\d+)?)/g, (match, numberStr) => {
       const num = parseFloat(numberStr.replace(/,/g, ''));
       if (isNaN(num)) return match;
       const converted = Math.round(num * currencyObj.rateToUSD);
-      // Format with locale commas
       return `${currencyObj.symbol}${converted.toLocaleString()}`;
     });
   };
