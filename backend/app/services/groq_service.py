@@ -115,6 +115,46 @@ class GroqItineraryService:
         if "destination" not in parsed or not parsed["destination"]:
             parsed["destination"] = req.destination
 
+        # Clean days and activities to prevent Pydantic 500 errors on minor LLM formatting anomalies
+        if "days" in parsed and isinstance(parsed["days"], list):
+            cleaned_days = []
+            for d_idx, d in enumerate(parsed["days"]):
+                if not isinstance(d, dict):
+                    continue
+                day_num = d.get("day_number", d_idx + 1)
+                theme = d.get("theme", f"Day {day_num} Highlights")
+                raw_activities = d.get("activities", [])
+                cleaned_activities = []
+                if isinstance(raw_activities, list):
+                    for a in raw_activities:
+                        if isinstance(a, dict):
+                            # Ensure lat and lon are valid floats or fallback to destination coords
+                            try:
+                                lat = float(a.get("latitude", 0.0))
+                            except (ValueError, TypeError):
+                                lat = 0.0
+                            try:
+                                lon = float(a.get("longitude", 0.0))
+                            except (ValueError, TypeError):
+                                lon = 0.0
+                            cleaned_activities.append({
+                                "time_slot": str(a.get("time_slot", "Morning")),
+                                "title": str(a.get("title", "Local Exploration")),
+                                "description": str(a.get("description", "")),
+                                "location": str(a.get("location", req.destination)),
+                                "cost_estimate": str(a.get("cost_estimate", "Free")),
+                                "travel_tips": str(a.get("travel_tips", "")),
+                                "latitude": lat,
+                                "longitude": lon
+                            })
+                cleaned_days.append({
+                    "day_number": day_num,
+                    "date": d.get("date"),
+                    "theme": theme,
+                    "activities": cleaned_activities
+                })
+            parsed["days"] = cleaned_days
+
         # Validate through Pydantic
         return ItineraryData(**parsed)
 
