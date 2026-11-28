@@ -76,10 +76,30 @@ export default function TripPlanningForm() {
 
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+  const [loadingStage, setLoadingStage] = useState(0);
   const [apiError, setApiError] = useState(null);
   const [generatedTrip, setGeneratedTrip] = useState(null);
   const [userPrefs, setUserPrefs] = useState(null);
   const [showPreferences, setShowPreferences] = useState(false);
+
+  const LOADING_STAGES = [
+    { title: 'Connecting to Groq AI Engine...', desc: 'Analyzing destination highlights, optimal travel paces, and local secrets.' },
+    { title: 'Synthesizing GPS Coordinates & OpenStreetMap Routes...', desc: 'Pinpointing accurate latitudes, longitudes, and walking directions.' },
+    { title: 'Forecasting Open-Meteo Weather & Smart Packing...', desc: 'Checking seasonal temperatures, rain probability, and essentials.' },
+    { title: 'Finalizing Day-by-Day Schedules & Budget Estimates...', desc: 'Assembling morning, afternoon, and evening timelines with verified costs.' },
+  ];
+
+  // Multi-stage progress indicator effect
+  useEffect(() => {
+    let interval;
+    if (loading) {
+      setLoadingStage(0);
+      interval = setInterval(() => {
+        setLoadingStage((prev) => (prev < LOADING_STAGES.length - 1 ? prev + 1 : prev));
+      }, 1500);
+    }
+    return () => clearInterval(interval);
+  }, [loading]);
 
   // Load user saved preferences on mount
   useEffect(() => {
@@ -169,7 +189,20 @@ export default function TripPlanningForm() {
       };
 
       const result = await generateItinerary(payload);
-      setGeneratedTrip(result?.data || payload);
+      const tripObj = {
+        id: 'new',
+        destination: formData.destination.trim(),
+        start_date: formData.startDate,
+        end_date: formData.endDate,
+        budget: formData.budget,
+        travel_style: formData.travelStyle,
+        interests: formData.interests,
+        itinerary_data: result?.data?.itinerary || result?.data || payload,
+        created_at: new Date().toISOString(),
+      };
+      // Save directly into session and navigate to the rich Trip View with Map & Weather
+      sessionStorage.setItem('viewing_trip', JSON.stringify(tripObj));
+      navigate('/trip/new');
     } catch (err) {
       const message =
         err.response?.data?.detail ||
@@ -406,13 +439,48 @@ export default function TripPlanningForm() {
             </button>
           </form>
 
-          {/* Loading state indicator */}
+          {/* Multi-Stage Animated AI Loading State */}
           {loading && (
-            <div className="alert alert-info">
-              <Loader2 size={18} className="spinner" />
-              <div>
-                <strong>AI is crafting your customized itinerary...</strong>
-                <p>Generating personalized day-by-day schedules, realistic travel times, and local tips with Groq.</p>
+            <div 
+              style={{ 
+                marginTop: '1.75rem', 
+                padding: '1.5rem', 
+                borderRadius: '16px', 
+                background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.85) 0%, rgba(30, 58, 138, 0.4) 100%)', 
+                border: '1px solid rgba(56, 189, 248, 0.3)',
+                boxShadow: '0 10px 30px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1)'
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', marginBottom: '1rem' }}>
+                <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: 'rgba(56, 189, 248, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Sparkles size={20} color="#38bdf8" className="spinner" />
+                </div>
+                <div>
+                  <h4 style={{ fontSize: '1rem', fontWeight: 800, color: '#ffffff', margin: 0 }}>
+                    {LOADING_STAGES[loadingStage].title}
+                  </h4>
+                  <p style={{ fontSize: '0.84rem', color: '#94a3b8', margin: '0.2rem 0 0 0' }}>
+                    {LOADING_STAGES[loadingStage].desc}
+                  </p>
+                </div>
+              </div>
+
+              {/* Stage Progress Bar */}
+              <div style={{ width: '100%', height: '6px', background: 'rgba(255,255,255,0.08)', borderRadius: '999px', overflow: 'hidden' }}>
+                <div 
+                  style={{ 
+                    height: '100%', 
+                    width: `${((loadingStage + 1) / LOADING_STAGES.length) * 100}%`, 
+                    background: 'linear-gradient(90deg, #38bdf8 0%, #3b82f6 50%, #8b5cf6 100%)',
+                    borderRadius: '999px',
+                    transition: 'width 0.6s cubic-bezier(0.16, 1, 0.3, 1)'
+                  }} 
+                />
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.65rem', fontSize: '0.74rem', color: '#64748b', fontWeight: 600 }}>
+                <span>Phase {loadingStage + 1} of {LOADING_STAGES.length}</span>
+                <span>Optimizing with Groq LLaMA</span>
               </div>
             </div>
           )}
