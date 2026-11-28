@@ -151,8 +151,13 @@ def chat_message(req: ChatRequest):
         for m in req.messages:
             conversation.append({"role": m.role, "content": m.content})
 
+        # Determine model with safe fallback
+        model = settings.GROQ_MODEL
+        if not model or "llama-3.3" in model:
+            model = "openai/gpt-oss-120b"
+
         response = client.chat.completions.create(
-            model=settings.GROQ_MODEL,
+            model=model,
             messages=conversation,
             temperature=0.7,
             max_tokens=3500,

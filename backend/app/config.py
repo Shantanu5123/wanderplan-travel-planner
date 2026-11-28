@@ -12,7 +12,10 @@ class Settings:
         
         # Groq API
         self.GROQ_API_KEY: str = os.getenv("GROQ_API_KEY", "")
-        self.GROQ_MODEL: str = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
+        raw_model: str = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
+        if not raw_model or "llama-3.3" in raw_model:
+            raw_model = "openai/gpt-oss-120b"
+        self.GROQ_MODEL: str = raw_model
         
         # Supabase Configuration
         raw_supabase_url = os.getenv("SUPABASE_URL", "")
